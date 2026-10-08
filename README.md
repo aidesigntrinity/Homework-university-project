@@ -60,6 +60,10 @@ I could not test against a real ManageBac account, so these are assumptions:
 - Schools can restrict calendar subscriptions; if "Subscribe to Calendar" is missing for you, ask your school.
 - Reminders only cover the next 30 days of the feed.
 
+## Deploying to a host (Railway, Render, Fly.io, ...)
+
+The repo has a `Dockerfile`, so any host that builds from GitHub can run it. Set these variables in the host's settings (never commit them): `TELEGRAM_BOT_TOKEN`, `DEFAULT_TIMEZONE`, and ideally `ALLOWED_USER_IDS`. Attach a persistent volume at `/data` so users' links and settings survive restarts (the database is `/data/bot.sqlite3` by default in the container). Use a worker/background service type, not a web service that sleeps. The Dockerfile has not been build-tested yet.
+
 ## Development
 
 ```bash
