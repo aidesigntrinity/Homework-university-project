@@ -8,6 +8,10 @@ The whole app is one file: [`docs/index.html`](docs/index.html). There is no bui
 
 Repository **Settings → Pages → Build and deployment → Source: Deploy from a branch**, choose this repository's branch and the **/docs** folder, then **Save**. The address appears at the top of that page (normally `https://<owner>.github.io/<repository>/`).
 
+### Publishing on Vercel instead
+
+This repository includes `vercel.json`, which tells Vercel it is a static site: no framework, no install or build step, and the `docs/` folder is the output. If Vercel still reports a Python error, check Project Settings → Build & Development Settings (Framework Preset: Other, Output Directory: `docs`), and redeploy the **latest** commit rather than an old failed deployment.
+
 ## What it does
 
 - **Home:** the next deadline with a live countdown, Mark done, level and streak, and what is coming up.
