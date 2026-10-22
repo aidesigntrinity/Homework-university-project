@@ -1,80 +1,37 @@
-# ManageBac homework reminder bot (Telegram)
+# Due Board
 
-A Telegram bot that watches your ManageBac calendar and messages you when homework is due.
+A free homework tracker for ManageBac students: deadlines on a Home screen, a Calendar, and a Progress page with points, levels and streaks. It is a static website with no server and no database. Each visitor's homework is stored only in their own browser.
 
-## Due Board website (free, no server)
+The whole app is one file: [`docs/index.html`](docs/index.html). There is no build step and no backend code.
 
-`docs/` is a complete static website: the Due Board app (Home, Calendar, Progress), installable on a phone and usable offline. Each visitor's homework is stored only in their own browser, so there is nothing to host or pay for.
+## Publish it (free, GitHub Pages)
 
-To publish it on GitHub Pages: repository **Settings → Pages → Build and deployment → Source: Deploy from a branch**, choose this repository's branch and the **/docs** folder, then Save. The address then shows at the top of that page (normally `https://<owner>.github.io/<repository>/`).
-
-## How it connects to ManageBac
-
-ManageBac's public API needs a token issued by a school **administrator**, so students can't use it. Instead the bot uses the **calendar subscription link** that every student can copy from ManageBac (the same link you'd give Google Calendar). The bot downloads that iCal feed every 15 minutes.
-
-- No ManageBac password is ever given to the bot.
-- The link is a secret: anyone who has it can read your calendar. The bot deletes the message you paste it in, only fetches `managebac.com` / `managebac.cn` hosts, avoids logging it, and stores it in a `chmod 600` SQLite file. If it leaks, regenerate it in ManageBac.
+Repository **Settings → Pages → Build and deployment → Source: Deploy from a branch**, choose this repository's branch and the **/docs** folder, then **Save**. The address appears at the top of that page (normally `https://<owner>.github.io/<repository>/`).
 
 ## What it does
 
-| Command | |
-|---|---|
-| `/connect <link>` | link your ManageBac calendar |
-| `/homework [days]` | list what's due (default 14 days) |
-| `/remind 24 3` | remind N hours before each deadline (`off` to disable) |
-| `/digest 08:00` | daily summary of the next 7 days (`off` to disable) |
-| `/timezone Europe/London` | your timezone (IANA name) |
-| `/ignore lesson, CAS` | hide items containing these words (`clear` to reset) |
-| `/settings`, `/disconnect` | show settings / delete everything the bot stores about you |
+- **Home:** the next deadline with a live countdown, Mark done, level and streak, and what is coming up.
+- **Calendar:** month and week views, tap a day to see its homework, add to Google Calendar.
+- **Progress:** level ring, points, tasks per day, a 12-week activity map, progress by subject, points history.
+- **Points:** finish a day early, on time, or late for different points, plus a bonus for the first task each day. Point values and level names are editable in Settings.
+- **Installable and offline:** add it to a phone's home screen; it opens without internet.
+- **Backup:** Settings → Your data downloads or restores the homework list as a file.
 
-Defaults: reminders 24 h and 3 h before a deadline, digest at 08:00. If you connect when a deadline is already inside the 24 h window you get one reminder, not two.
+## Connecting ManageBac
 
-## Setup
+ManageBac's own API needs an administrator token, so students cannot use it. Due Board works from the **calendar subscription link** every student can copy (My Workspace → View Full Calendar → Subscribe to Calendar). The link is a private key to your calendar: keep it private.
 
-1. Message [@BotFather](https://t.me/BotFather), send `/newbot`, copy the token.
-2. Install and configure:
-   ```bash
-   python3 -m venv .venv && . .venv/bin/activate
-   pip install -r requirements.txt
-   cp .env.example .env      # then fill in TELEGRAM_BOT_TOKEN, DEFAULT_TIMEZONE
-   ```
-   Set `ALLOWED_USER_IDS` (get your ID from [@userinfobot](https://t.me/userinfobot)) if you don't want strangers using your bot.
-3. **Check your feed first** (see below), then run the bot:
-   ```bash
-   python -m homework_bot
-   ```
-4. In Telegram: `/start`, then get your link in ManageBac — **My Workspace → View Full Calendar → Subscribe to Calendar** (menu names may differ slightly between ManageBac versions) — and send `/connect <link>`.
+Two ways to bring it in, both under Settings → ManageBac:
 
-The bot must stay running to send reminders (a small VPS, Raspberry Pi, or any always-on machine; a systemd service or `tmux` is enough).
+1. **Import a file.** Open the link in a browser tab to download the `.ics` file, then drop it into the app (or paste its text). Re-importing updates items instead of duplicating them.
+2. **Auto-sync.** A browser page cannot read another site's calendar, so the app asks a tiny relay that runs in *your own* Google account (Google Apps Script, free). The code to paste is shown in Settings; the app fetches your deadlines when it opens and every 15 minutes while it is open.
 
-### Check how your feed looks
+Assumptions not yet checked against a real ManageBac feed: a task's due time is the event's start time, all-day items are due at 23:59, and lessons may appear in the feed (use "Skip these words" in Settings to hide them).
 
-```bash
-python -m homework_bot.check_feed        # paste the link at the hidden prompt
-python -m homework_bot.check_feed --raw  # also dump raw iCal fields
-```
+## Connecting Google Calendar
 
-This prints every event the bot sees with its due time. Run it once before trusting the reminders.
+There is no Google sign-in. Instead: each task has an **Add to Google Calendar** link (opens Google Calendar with the due time filled in), Settings can download all upcoming homework as a file to import into Google Calendar, and you can also subscribe your ManageBac link directly in Google Calendar (Other calendars → From URL).
 
-## Assumptions to verify against your school's feed
+## Privacy
 
-I could not test against a real ManageBac account, so these are assumptions:
-
-- **Due time = the event's start time (`DTSTART`).** If your feed puts the deadline in `DTEND` instead, times will be off — `check_feed --raw` shows which.
-- **All-day items are treated as due at 23:59 local time** on that date.
-- **The feed may also contain lessons/events**, not just homework. Use `/ignore` to hide words that appear in those titles.
-- Schools can restrict calendar subscriptions; if "Subscribe to Calendar" is missing for you, ask your school.
-- Reminders only cover the next 30 days of the feed.
-
-## Deploying to a host (Railway, Render, Fly.io, ...)
-
-The repo has a `Dockerfile`, so any host that builds from GitHub can run it. Set these variables in the host's settings (never commit them): `TELEGRAM_BOT_TOKEN`, `DEFAULT_TIMEZONE`, and ideally `ALLOWED_USER_IDS`. Attach a persistent volume at `/data` so users' links and settings survive restarts (the database is `/data/bot.sqlite3` by default in the container). Use a worker/background service type, not a web service that sleeps. The Dockerfile has not been build-tested yet.
-
-## Development
-
-```bash
-pip install -r requirements-dev.txt
-python -m pytest
-```
-
-Layout: `managebac.py` (fetch + parse feed), `reminders.py` (pure scheduling logic), `storage.py` (SQLite), `formatting.py` (messages), `bot.py` (Telegram handlers + polling job).
+Nothing is sent to a server. Homework, points and settings live in the browser's local storage on the device. The only outside requests are the fonts and, if you turn it on, the auto-sync relay you created yourself.
