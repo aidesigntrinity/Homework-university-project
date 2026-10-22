@@ -1,0 +1,17 @@
+rules_version = '2';
+// Due Board: each signed-in person can read and change only their own document, users/{their uid}.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['v', 'rev', 'tasks', 'points', 'log', 'settings', 'stats', 'profile'])
+        && request.resource.data.points is int
+        && request.resource.data.points >= 0 && request.resource.data.points <= 1000000;
+    }
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

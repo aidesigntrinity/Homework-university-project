@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Due Board"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="firebase-config.js"></script>
 <title>Due Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,6 +310,77 @@
   .nums { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .nums label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--muted); }
 
+
+  /* Sign in / create account */
+  .auth { display: flex; flex-direction: column; gap: 18px; padding-top: 12px; }
+  .brand-big { font: 700 64px/0.9 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; }
+  .tagline { color: var(--muted); font-size: 16px; max-width: 32ch; }
+  .auth .card { display: flex; flex-direction: column; gap: 16px; }
+  .seg.wide { width: 100%; } .seg.wide button { flex: 1; }
+  .pw-wrap { position: relative; }
+  .pw-wrap .inp { padding-right: 76px; }
+  .pw-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); height: 40px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--teal); font-size: 13px; font-weight: 700; }
+  .link-btn { border: 0; background: none; color: var(--teal); font-size: 14px; font-weight: 700; min-height: 44px; padding: 0; text-align: left; align-self: flex-start; }
+  .note { font-size: 14px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
+  .note.bad { color: var(--coral); border-color: var(--coral); }
+  .note.good { color: var(--teal); border-color: var(--mid); }
+  .guest-box { display: flex; flex-direction: column; gap: 4px; align-items: center; text-align: center; }
+  .guest-box .hint { max-width: 34ch; }
+
+  /* Account section in Settings */
+  .acct-head { display: flex; align-items: center; gap: 14px; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--amber); color: var(--bg); display: grid; place-items: center; font: 700 24px/1 var(--font-display); flex: none; }
+  .acct-head b { display: block; font-size: 17px; overflow-wrap: anywhere; }
+  .acct-head span:not(.avatar) { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+  .inline { display: flex; gap: 8px; align-items: stretch; } .inline .inp { flex: 1; min-width: 0; }
+  .danger-box { border: 1px solid var(--coral); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .danger-box p { font-size: 14px; }
+  .btn-s.solid-danger { background: var(--coral); border-color: var(--coral); color: var(--bg); font-weight: 700; }
+
+  /* Home hero: Mark done + Focus */
+  .hero-actions { display: flex; gap: 10px; margin-top: 10px; }
+  .hero-actions .btn-teal { margin-top: 0; flex: 2; }
+  .btn-focus { flex: 1; height: 60px; border: 2px solid var(--amber); border-radius: 16px; background: transparent; color: var(--amber); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .left-note { font-size: 13px; color: var(--amber); font-weight: 600; overflow-wrap: anywhere; }
+  .ccard-actions > * { flex: 1; }
+  .ccard-actions > :last-child { flex: 2; }
+
+  .nums2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .mini { background: var(--bg); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .mini b { font: 700 30px/1 var(--font-display); }
+  .mini span { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+
+  /* Focus mode */
+  .focus { display: flex; flex-direction: column; gap: 18px; }
+  .focus-task { display: flex; flex-direction: column; gap: 8px; }
+  .focus-task .t { font-size: 26px; font-weight: 700; overflow-wrap: anywhere; line-height: 1.15; }
+  .dur { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dur button { min-height: 120px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .dur button b { font: 700 56px/1 var(--font-display); }
+  .dur button span { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); }
+  .dur button[aria-pressed="true"] { background: var(--amber); border-color: var(--amber); color: var(--bg); }
+  .dur button[aria-pressed="true"] span { color: var(--bg); }
+  .focus-ring { position: relative; width: 260px; height: 260px; margin: 6px auto 0; }
+  .focus-ring svg { display: block; }
+  .focus-ring .mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .focus-ring .mid b { font: 700 76px/0.9 var(--font-display); font-variant-numeric: tabular-nums; }
+  .focus-ring .mid span { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+  .focus-ring.paused .mid b { color: var(--muted); }
+  .focus-desc { background: var(--surface); border-radius: 16px; padding: 14px 16px; font-size: 15px; overflow-wrap: anywhere; }
+  .focus-desc span { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+  .focus-actions { display: flex; gap: 10px; }
+  .focus-actions button { flex: 1; height: 60px; border-radius: 16px; font-size: 17px; font-weight: 700; }
+  .btn-outline-amber { border: 2px solid var(--amber); background: transparent; color: var(--amber); }
+  .btn-solid-teal { border: 0; background: var(--teal); color: var(--teal-ink); }
+  .btn-solid-amber { border: 0; background: var(--amber); color: var(--bg); }
+  .focus-q { text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .focus-q .badge { width: 84px; height: 84px; border-radius: 50%; background: var(--teal); color: var(--teal-ink); display: grid; place-items: center; }
+  .focus-q h2 { font: 700 40px/1 var(--font-display); text-transform: uppercase; letter-spacing: 0.02em; }
+  .focus-q p { color: var(--muted); font-size: 15px; }
+  .choice { display: flex; flex-direction: column; gap: 10px; }
+  .choice button { min-height: 64px; border-radius: 18px; font-size: 17px; font-weight: 700; padding: 0 16px; }
+  .discard { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+
   .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(196px + env(safe-area-inset-bottom, 0px)); background: var(--text); color: var(--bg); padding: 8px 8px 8px 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px; max-width: calc(100vw - 32px); z-index: 20; box-shadow: 0 6px 24px rgb(0 0 0 / 0.4); font-size: 14px; font-weight: 600; }
   body.no-tabs .toast { bottom: 24px; }
   .toast button { min-height: 40px; background: transparent; border: 1px solid currentColor; color: inherit; border-radius: 8px; padding: 0 12px; font-weight: 700; }
@@ -323,6 +395,8 @@
   <section class="page" id="page-calendar" aria-label="Calendar" hidden></section>
   <section class="page" id="page-progress" aria-label="Progress" hidden></section>
   <section class="page" id="page-level" aria-label="Level details" hidden></section>
+  <section class="page" id="page-focus" aria-label="Focus session" hidden></section>
+  <section class="page" id="page-auth" aria-label="Sign in" hidden></section>
 </div>
 
 <div class="fab-wrap" id="fab-wrap"><button class="fab" id="fab" type="button"></button></div>
@@ -390,6 +464,7 @@
           <a id="a-gcal" href="#" target="_blank" rel="noopener">Add to Google Calendar</a>
           <a id="a-mb" href="#" target="_blank" rel="noopener" hidden>Open in ManageBac</a>
         </div>
+        <button class="alt" type="button" id="a-focus" hidden>Start a focus session</button>
         <button class="ghost" type="button" id="a-cancel">Cancel</button>
         <button class="ghost danger" type="button" id="a-delete" hidden>Delete this homework</button>
       </div>
@@ -417,7 +492,12 @@
     </div>
     <div class="sheet-body" style="gap:0">
 
-      <details class="sect" open>
+      <details class="sect" id="sect-account" open hidden>
+        <summary>Account</summary>
+        <div class="in" id="acct-in"></div>
+      </details>
+
+      <details class="sect" id="sect-mb" open>
         <summary>ManageBac</summary>
         <div class="in">
           <p class="hint">This page cannot reach ManageBac by itself, so it works from your ManageBac calendar link. Two ways to bring it in:</p>
@@ -545,6 +625,21 @@ function doGet(e) {
       </details>
     </div>
     <div class="sheet-foot"><button class="save" type="button" id="settings-close">Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-move" aria-labelledby="move-heading">
+  <div class="sheet">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="sheet-head"><h1 id="move-heading">Welcome</h1></div>
+    <div class="sheet-body">
+      <p id="move-text"></p>
+      <p class="hint">If you start fresh, the homework stays on this device and you can still see it by using Due Board without an account.</p>
+    </div>
+    <div class="sheet-foot">
+      <button class="save" type="button" id="move-yes">Move it into my account</button>
+      <button class="ghost" type="button" id="move-no">Start fresh</button>
+    </div>
   </div>
 </dialog>
 
@@ -797,10 +892,25 @@ function doGet(e) {
     }
     return { cells: cells, months: months };
   }
+
+  // ---- focus and streak helpers ----
+  function mmss(ms) { var s = Math.max(0, Math.ceil(ms / 1000)), m = Math.floor(s / 60); return pad(m) + ":" + pad(s % 60); }
+  function fmtMins(m) { m = Math.round(m); var h = Math.floor(m / 60), r = m % 60; return h ? h + " H" + (r ? " " + r + " MIN" : "") : r + " MIN"; }
+  // Longest run of consecutive days with at least one finished task.
+  function longestStreak(doneAts) {
+    var days = {}, best = 0, run = 0, prev = null;
+    doneAts.forEach(function (ms) { if (ms) days[startOfDay(ms)] = 1; });
+    Object.keys(days).map(Number).sort(function (a, b) { return a - b; }).forEach(function (d) {
+      run = prev !== null && startOfDay(addDays(prev, 1)) === d ? run + 1 : 1;
+      best = Math.max(best, run); prev = d;
+    });
+    return best;
+  }
   /* PURE:END */
 
   // ================= state =================
-  var CACHE_KEY = "dueboard:v1", PAGE_KEY = "dueboard:page", FIRED_KEY = "dueboard:fired";
+  var CACHE_KEY = "dueboard:v1", PAGE_KEY = "dueboard:page", FIRED_KEY = "dueboard:fired", MODE_KEY = "dueboard:mode", LASTUID_KEY = "dueboard:lastuid", FOCUS_KEY = "dueboard:focus";
+  var FB = window.DUEBOARD_FIREBASE || null;   // set by firebase-config.js on the website
   var PALETTE = ["#B7C72B", "#E0775A", "#5FB4E8", "#B994F5", "#F08FB4", "#F2A65A", "#6FD3C2", "#D9C36A"];
   var DAY_FULL = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
   var QUICK_TIMES = ["08:00", "09:30", "16:00", "23:59"];
@@ -809,10 +919,10 @@ function doGet(e) {
     return { leads: [24, 3], ignore: [], notify: false, syncUrl: "", pts: { early: 15, onTime: 10, late: 5, streak: 5 },
              names: DEFAULT_NAMES.slice(), subjectColors: {}, calDefault: true, remindDefault: true };
   }
-  var state = { tasks: {}, points: 0, log: [], settings: defaultSettings() };
+  var state = { tasks: {}, points: 0, log: [], settings: defaultSettings(), stats: { done: 0, best: 0 }, profile: { name: "" }, rev: 0 };
   var ui = { page: "home", calMode: "month", calAnchor: startOfDay(Date.now()), calSel: dayKey(Date.now()), calSubject: "" };
   var undoSnap = null, toastTimer = null;
-  var dbDoc = null, saving = false, dirty = false, mode = "starting";
+  var saving = false, dirty = false, mode = "starting", acct = null;
   var fired = {};
 
   function $(id) { return document.getElementById(id); }
@@ -843,6 +953,7 @@ function doGet(e) {
   }
   var ICONS = {
     check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+    timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>',
     sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
     left: '<path d="M15 5l-7 7 7 7"/>', right: '<path d="M9 5l7 7-7 7"/>',
     bolt: '<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>', lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
@@ -863,16 +974,19 @@ function doGet(e) {
   }
 
   function normalize(d) {
-    var out = { tasks: {}, points: 0, log: [], settings: defaultSettings() };
+    var out = { tasks: {}, points: 0, log: [], settings: defaultSettings(), stats: { done: 0, best: 0 }, profile: { name: "" }, rev: 0 };
     if (!d || typeof d !== "object") return out;
     out.points = Math.min(1000000, Math.max(0, Math.floor(+d.points || 0)));
+    out.rev = Math.max(0, Math.floor(+d.rev || 0));
+    if (d.stats && typeof d.stats === "object") { out.stats.done = Math.min(100000, Math.max(0, Math.floor(+d.stats.done || 0))); out.stats.best = Math.min(10000, Math.max(0, Math.floor(+d.stats.best || 0))); }
+    if (d.profile && typeof d.profile === "object") out.profile.name = String(d.profile.name || "").slice(0, 60);
     var t = d.tasks || {};
     Object.keys(t).forEach(function (id) {
       var x = t[id];
       if (!x || typeof x.title !== "string" || typeof x.due !== "number" || !isFinite(x.due)) return;
       out.tasks[id] = { id: id, title: x.title.slice(0, 200), subject: String(x.subject || "").slice(0, 40), due: x.due, allDay: !!x.allDay,
         notes: String(x.notes || "").slice(0, 600), done: !!x.done, doneAt: x.doneAt || 0, pts: Math.min(1000, Math.max(0, Math.floor(+x.pts || 0))),
-        src: x.src === "managebac" ? "managebac" : "manual", link: String(x.link || ""), remind: x.remind !== false };
+        src: x.src === "managebac" ? "managebac" : "manual", link: String(x.link || ""), remind: x.remind !== false, remaining: String(x.remaining || "").slice(0, 300) };
     });
     var s = d.settings || {}, o = out.settings;
     if (Array.isArray(s.leads)) o.leads = s.leads.filter(function (n) { return typeof n === "number" && n > 0 && n <= 336; }).sort(function (a, b) { return b - a; });
@@ -884,54 +998,90 @@ function doGet(e) {
     if (s.subjectColors && typeof s.subjectColors === "object") Object.keys(s.subjectColors).slice(0, 60).forEach(function (k) { var v = Math.floor(+s.subjectColors[k]); if (v >= 0 && v < PALETTE.length) o.subjectColors[String(k).slice(0, 40)] = v; });
     o.calDefault = s.calDefault !== false; o.remindDefault = s.remindDefault !== false;
     if (Array.isArray(d.log)) {
-      d.log.slice(-400).forEach(function (e) {
-        if (!e || (e.k !== "t" && e.k !== "b") || typeof e.at !== "number" || !isFinite(e.at)) return;
+      d.log.slice(-600).forEach(function (e) {
+        if (!e || (e.k !== "t" && e.k !== "b" && e.k !== "f") || typeof e.at !== "number" || !isFinite(e.at)) return;
         out.log.push({ k: e.k, at: e.at, pts: Math.min(1000, Math.max(0, Math.floor(+e.pts || 0))), task: String(e.task || "").slice(0, 60), title: String(e.title || "").slice(0, 200),
-          subject: String(e.subject || "").slice(0, 40), how: String(e.how || "").slice(0, 20), day: String(e.day || "").slice(0, 10) });
+          subject: String(e.subject || "").slice(0, 40), how: String(e.how || "").slice(0, 20), day: String(e.day || "").slice(0, 10), mins: Math.min(600, Math.max(0, Math.floor(+e.mins || 0))) });
       });
     } else {
       // Older saves had no history: rebuild it from tasks that were already finished.
       Object.keys(out.tasks).forEach(function (id) { var x = out.tasks[id]; if (x.done && x.doneAt) out.log.push({ k: "t", at: x.doneAt, pts: x.pts, task: id, title: x.title, subject: x.subject, how: "", day: "" }); });
       out.log.sort(function (a, b) { return a.at - b.at; });
     }
+    if (!d.stats) out.stats.done = out.log.filter(function (e) { return e.k === "t"; }).length;
     return out;
   }
   function serialize() {
     var now = Date.now(), cutoff = now - 45 * DAY;
     Object.keys(state.tasks).forEach(function (id) { var t = state.tasks[id]; if (t.done && (t.doneAt || t.due) < cutoff) delete state.tasks[id]; });
-    state.log = state.log.filter(function (e) { return e.at >= now - 100 * DAY; }).slice(-400);
-    return { v: 2, tasks: state.tasks, points: state.points, log: state.log, settings: state.settings };
+    state.log = state.log.filter(function (e) { return e.at >= now - 100 * DAY; }).slice(-600);
+    return { v: 3, rev: state.rev || 0, tasks: state.tasks, points: state.points, log: state.log, settings: state.settings, stats: state.stats, profile: state.profile };
   }
 
   // ================= saving =================
+  // One store at a time: the visitor's account (Firestore), the Claude page's own store, or this device only.
+  var store = { kind: "local", doc: null, key: CACHE_KEY }, unsub = null;
   function setStatus() {
+    var m = mode === "starting" && typeof navigator !== "undefined" && navigator.onLine === false ? "offline" : mode;
     var text = {
       starting: "Loading your list...",
-      account: "Saved to your account. Same list on every device you sign in on.",
+      account: store.kind === "firebase" && acct ? "Saved to your account (" + acct.email + "). Same list on every device you sign in on." : "Saved to your account. Same list on every device you sign in on.",
       saving: "Saving...",
+      offline: "You are offline. Changes are kept on this device and sync when you are back online.",
       local: window.claude && window.claude.use ? "Saved in this browser only. Open this page signed in to claude.ai to keep it on your account." : "Saved on this device only. Nothing is sent to a server. Use Settings, Your data, to back it up.",
-      error: "Could not save to your account just now. Your list is kept in this browser."
-    }[mode];
+      error: "Could not save to your account just now. Your changes are kept on this device."
+    }[m];
     if ($("status")) $("status").textContent = text || "";
   }
-  function cacheLocal() { try { localStorage.setItem(CACHE_KEY, JSON.stringify(serialize())); } catch (e) {} }
+  function cacheLocal() { try { localStorage.setItem(store.key, JSON.stringify(serialize())); } catch (e) {} }
   function persist() {
+    state.rev = (state.rev || 0) + 1;
     cacheLocal();
-    if (!dbDoc) { if (mode !== "starting") { mode = "local"; setStatus(); } return; }
+    if (!store.doc) { if (mode !== "starting") { mode = store.kind === "local" ? "local" : "offline"; setStatus(); } return; }
     dirty = true; flush();
   }
   function flush() {
-    if (saving) return;
+    if (saving || !store.doc) return;
+    var doc = store.doc;
     saving = true; mode = "saving"; setStatus();
     (function loop() {
+      if (store.doc !== doc) { saving = false; dirty = false; return; }
       if (!dirty) { saving = false; mode = "account"; setStatus(); return; }
       dirty = false;
-      dbDoc.set(serialize()).then(loop, function () { saving = false; dirty = false; mode = "error"; setStatus(); });
+      doc.set(JSON.parse(JSON.stringify(serialize()))).then(loop, function () { saving = false; dirty = false; mode = "error"; setStatus(); });
     })();
+  }
+  // Follow one stored document. This device's copy shows at once; the stored copy then takes over,
+  // unless this device holds newer changes (made offline), which are sent up instead.
+  function follow(doc, kind, key, onMissing) {
+    if (unsub) { unsub(); unsub = null; }
+    store = { kind: kind, doc: null, key: key }; saving = false; dirty = false;
+    try { var c = localStorage.getItem(key); state = c ? normalize(JSON.parse(c)) : normalize(null); } catch (e) { state = normalize(null); }
+    mode = "starting"; render();
+    var first = true;
+    unsub = doc.onSnapshot(function (snap) {
+      if (store.key !== key) return;
+      if (saving || dirty || (snap.metadata && snap.metadata.hasPendingWrites)) return;
+      store.doc = doc;
+      if (snap.exists) {
+        var server = normalize(snap.data());
+        if (first && (state.rev || 0) > (server.rev || 0)) persist();
+        else { state = server; cacheLocal(); mode = "account"; setStatus(); }
+        checkReminders(first); render();
+      } else if (first && onMissing) onMissing();
+      else if (first) { if (Object.keys(state.tasks).length) persist(); else { mode = "account"; setStatus(); } }
+      first = false; afterBoot();
+    }, function () { mode = kind === "firebase" ? "offline" : "error"; setStatus(); afterBoot(); });
+  }
+  function startGuest() {
+    if (unsub) { unsub(); unsub = null; }
+    store = { kind: "local", doc: null, key: CACHE_KEY }; saving = false; dirty = false;
+    try { var c = localStorage.getItem(CACHE_KEY); state = c ? normalize(JSON.parse(c)) : normalize(null); } catch (e) { state = normalize(null); }
+    mode = "local"; setStatus(); afterBoot();
   }
 
   // ================= undo toast =================
-  function snapshot() { return JSON.stringify({ tasks: state.tasks, points: state.points, log: state.log }); }
+  function snapshot() { return JSON.stringify({ tasks: state.tasks, points: state.points, log: state.log, stats: state.stats }); }
   function showToast(message, snap) {
     undoSnap = snap;
     $("toast-text").textContent = message;
@@ -941,7 +1091,7 @@ function doGet(e) {
     toastTimer = setTimeout(function () { $("toast").hidden = true; undoSnap = null; }, 7000);
   }
   $("toast-undo").addEventListener("click", function () {
-    if (undoSnap) { var s = JSON.parse(undoSnap); state.tasks = s.tasks; state.points = s.points; state.log = s.log; persist(); render(); }
+    if (undoSnap) { var s = JSON.parse(undoSnap); state.tasks = s.tasks; state.points = s.points; state.log = s.log; state.stats = s.stats; persist(); render(); }
     $("toast").hidden = true; undoSnap = null;
   });
 
@@ -971,7 +1121,8 @@ function doGet(e) {
     if (done && !t.done) {
       var pts = pointsFor(t.due, now, cfg), how = pts === cfg.early && t.due - now >= 24 * HOUR ? "early" : t.due >= now ? "on time" : "late";
       t.pts = pts; state.points += pts;
-      state.log.push({ k: "t", at: now, pts: pts, task: t.id, title: t.title, subject: t.subject, how: how, day: "" });
+      state.log.push({ k: "t", at: now, pts: pts, task: t.id, title: t.title, subject: t.subject, how: how, day: "", mins: 0 });
+      state.stats.done++;
       text = "+" + pts + " points · " + (how === "early" ? "finished early" : how === "late" ? "late, but done" : "on time");
       var day = dayKey(now);
       if (cfg.streak > 0 && !state.log.some(function (e) { return e.k === "b" && e.day === day; })) {
@@ -983,6 +1134,7 @@ function doGet(e) {
       for (i = state.log.length - 1; i >= 0; i--) if (state.log[i].k === "t" && state.log[i].task === t.id) { idx = i; break; }
       if (idx >= 0) {
         var entry = state.log.splice(idx, 1)[0], d2 = dayKey(entry.at);
+        state.stats.done = Math.max(0, state.stats.done - 1);
         state.points = Math.max(0, state.points - entry.pts);
         if (!state.log.some(function (e) { return e.k === "t" && dayKey(e.at) === d2; })) {
           for (i = state.log.length - 1; i >= 0; i--) if (state.log[i].k === "b" && state.log[i].day === d2) { state.points = Math.max(0, state.points - state.log[i].pts); state.log.splice(i, 1); }
@@ -991,6 +1143,7 @@ function doGet(e) {
       t.pts = 0;
     }
     t.done = done; t.doneAt = done ? now : 0;
+    if (done) state.stats.best = Math.max(state.stats.best, streakNow(now));
     var after = levelInfo(state.points, state.settings.names);
     if (done && after.level > before) text += " · Level " + after.level + ": " + after.title + "!";
     persist(); render();
@@ -1005,7 +1158,7 @@ function doGet(e) {
   // ================= navigation =================
   function setPage(p) {
     ui.page = p;
-    try { localStorage.setItem(PAGE_KEY, p === "level" ? "progress" : p); } catch (e) {}
+    try { localStorage.setItem(PAGE_KEY, p === "level" ? "progress" : (p === "focus" || p === "auth") ? "home" : p); } catch (e) {}
     render(); window.scrollTo(0, 0);
   }
   Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (b) { b.addEventListener("click", function () { setPage(b.getAttribute("data-page")); }); });
@@ -1017,6 +1170,7 @@ function doGet(e) {
     page.append(el("div", { class: "hdr" },
       el("div", { class: "col" }, el("span", { class: "eyebrow", text: longDate(now) }), el("h1", { class: "h1", text: "Due Board" })),
       el("button", { class: "icon-btn", id: "btn-settings", type: "button", "aria-label": "Settings", onclick: openSettings }, ico("sliders", 24, 2))));
+    var fban = focusBanner(); if (fban) page.append(fban);
 
     // Next deadline
     var hero = el("div", { class: "card hero" + (open.length ? "" : " empty") });
@@ -1027,7 +1181,10 @@ function doGet(e) {
         el("span", { class: "hero-big" + (late ? " late" : ""), text: bigCount(ms) }),
         el("span", { class: "hero-title", text: t.title }),
         el("div", { class: "hero-meta" }, tagEl(t), el("span", { text: dueLabel(t) })),
-        el("button", { class: "btn-teal", type: "button", onclick: function () { setDone(t, true); } }, ico("check", 22, 3), "Mark done"));
+        t.remaining ? el("span", { class: "left-note", text: "Left: " + t.remaining }) : null,
+        el("div", { class: "hero-actions" },
+          el("button", { class: "btn-teal", type: "button", onclick: function () { setDone(t, true); } }, ico("check", 22, 3), "Mark done"),
+          el("button", { class: "btn-focus", type: "button", id: "hero-focus", "aria-label": "Start a focus session for " + t.title, onclick: function () { openFocus(t.id); } }, ico("timer", 20, 2.4), "Focus")));
     } else {
       var none = !all.length;
       hero.append(el("span", { class: "eyebrow", text: none ? "Getting started" : "All clear" }),
@@ -1061,7 +1218,7 @@ function doGet(e) {
         next.map(function (t) {
           return el("div", { class: "hrow" }, checkbox(t),
             el("button", { class: "hmain", type: "button", "aria-label": "Edit " + t.title, onclick: function () { openAdd({ id: t.id }); } },
-              el("span", { class: "htitle", text: t.title }), el("span", { class: "hmeta" }, dotEl(t), dueLabel(t))),
+              el("span", { class: "htitle", text: t.title }), el("span", { class: "hmeta" }, dotEl(t), dueLabel(t)), t.remaining ? el("span", { class: "left-note", text: "Left: " + t.remaining }) : null),
             el("span", { class: "hin" + (t.due < now ? " late" : ""), text: shortIn(t.due - now) }));
         }),
         open.length > 5 ? el("button", { class: "more", type: "button", text: (open.length - 5) + " more in Calendar", onclick: function () { setPage("calendar"); } }) : null));
@@ -1144,10 +1301,11 @@ function doGet(e) {
       page.append(el("div", { class: "ccard" + (t.done ? " donecard" : "") },
         el("div", { class: "ccard-top" }, checkbox(t),
           el("button", { class: "ccard-main", type: "button", "aria-label": "Edit " + t.title, onclick: function () { openAdd({ id: t.id }); } },
-            el("span", { class: "t", text: t.title }), el("span", { class: "m" }, tagEl(t), el("span", { text: t.allDay ? "All day" : fmtTime(t.due) }))),
+            el("span", { class: "t", text: t.title }), el("span", { class: "m" }, tagEl(t), el("span", { text: t.allDay ? "All day" : fmtTime(t.due) })), t.remaining && !t.done ? el("span", { class: "left-note", text: "Left: " + t.remaining }) : null),
           t.done ? el("span", { class: "big done", text: "DONE" }) : el("span", { class: "big" + (ms < 0 ? " late" : ""), text: bigCount(ms) })),
         el("div", { class: "ccard-actions" },
           el("button", { type: "button", text: "Edit", onclick: function () { openAdd({ id: t.id }); } }),
+          t.done ? null : el("button", { type: "button", text: "Focus", "aria-label": "Start a focus session for " + t.title, onclick: function () { openFocus(t.id); } }),
           el("a", { href: gcalUrl(t), target: "_blank", rel: "noopener", text: "Add to Google Calendar" }))));
     });
   }
@@ -1177,6 +1335,16 @@ function doGet(e) {
       el("div", { class: "stat" }, el("b", { text: streak + " D" }), el("span", { text: "Streak" })),
       el("div", { class: "stat" }, el("b", { text: String(weekTasks.length) }), el("span", { text: "Tasks done" }))));
 
+    // streaks (kept per account)
+    var tLog = state.log.filter(function (e) { return e.k === "t"; });
+    var best = Math.max(state.stats.best, longestStreak(tLog.map(function (e) { return e.at; })), streak);
+    var onTime = tLog.length ? Math.round(tLog.filter(function (e) { return e.how !== "late"; }).length / tLog.length * 100) : null;
+    function mini(v, l, amber) { return el("div", { class: "mini" }, el("b", { style: amber ? "color:#F5B942" : null, text: v }), el("span", { text: l })); }
+    page.append(el("div", { class: "pcard", id: "streaks" },
+      el("div", { class: "row-between" }, el("span", { class: "ttl", text: "Streaks" }), el("span", { class: "small-muted", text: acct ? "Your account" : "This device" })),
+      el("div", { class: "nums2" }, mini(streak + " D", "Current streak", true), mini(best + " D", "Best streak"),
+        mini(onTime === null ? "–" : onTime + "%", "On time (100 days)"), mini(String(state.stats.done), "Finished in total"))));
+
     // tasks done per day (last 7 days, today on the right)
     var counts = doneCounts(), days = [], max = 1, i;
     for (i = 6; i >= 0; i--) { var dm = addDays(today, -i); days.push({ ms: dm, n: counts[dayKey(dm)] || 0, today: i === 0 }); max = Math.max(max, counts[dayKey(dm)] || 0); }
@@ -1186,6 +1354,22 @@ function doGet(e) {
       letters.append(el("span", { class: d.today ? "today" : "", text: DOW[new Date(d.ms).getDay()][0] }));
     });
     page.append(el("div", { class: "pcard" }, el("div", { class: "row-between" }, el("span", { class: "ttl", text: "Tasks done per day" }), el("span", { class: "small-muted", text: weekTasks.length + " this week" })), bars, letters));
+
+    // focus time per subject (last 7 days)
+    var fLog = weekLog.filter(function (e) { return e.k === "f"; }), fBy = {}, fTotal = 0;
+    fLog.forEach(function (e) { var k = e.subject || "No subject"; fBy[k] = (fBy[k] || 0) + e.mins; fTotal += e.mins; });
+    var fRows = Object.keys(fBy).sort(function (a, b) { return fBy[b] - fBy[a]; }), fMax = Math.max.apply(null, fRows.map(function (k) { return fBy[k]; }).concat([1]));
+    var fCard = el("div", { class: "pcard", id: "focus-card", style: "gap:14px" }, el("div", { class: "row-between" }, el("span", { class: "ttl", text: "Focus time" }), el("span", { class: "small-muted", text: "Last 7 days" })));
+    if (!fLog.length) fCard.append(el("p", { class: "small-muted", text: "Start a focus session from any homework to see your study time here." }));
+    else {
+      fCard.append(el("div", { style: "display:flex;gap:10px;align-items:baseline" }, el("span", { class: "num", style: "font-size:44px;color:#F5B942", text: fmtMins(fTotal) }), el("span", { class: "small-muted", text: fLog.length + (fLog.length === 1 ? " session" : " sessions") })));
+      fRows.forEach(function (k) {
+        var c = k === "No subject" ? "#8FB9AE" : subjColor(k), d = el("span", { class: "dot" }); d.style.setProperty("--c", c);
+        fCard.append(el("div", { class: "subj" }, el("div", { class: "subj-top" }, el("span", { class: "l" }, d, k), el("span", { class: "small-muted", text: fmtMins(fBy[k]).toLowerCase() })),
+          el("div", { class: "bar" }, el("div", { style: "width:" + Math.round(fBy[k] / fMax * 100) + "%;background:" + c }))));
+      });
+    }
+    page.append(fCard);
 
     // activity heatmap
     var g = activityGrid(counts, now), months = el("div", { class: "heat-months", "aria-hidden": "true" }), heat = el("div", { class: "heat", role: "img", "aria-label": "Tasks finished per day over the last 12 weeks" });
@@ -1211,7 +1395,7 @@ function doGet(e) {
     }
 
     // points history
-    var hist = weekLog.slice().sort(function (a, b) { return b.at - a.at; }).slice(0, 8);
+    var hist = weekLog.filter(function (e) { return e.k !== "f"; }).sort(function (a, b) { return b.at - a.at; }).slice(0, 8);
     var card = el("div", { class: "pcard", style: "padding-bottom:0;gap:0" }, el("div", { class: "row-between", style: "padding-bottom:8px" }, el("span", { class: "ttl", text: "Points history" }), el("span", { class: "small-muted", text: "Last 7 days" })));
     if (!hist.length) card.append(el("p", { class: "small-muted", style: "padding:8px 0 16px", text: "Finish a task to earn your first points." }));
     hist.forEach(function (e) {
@@ -1266,14 +1450,14 @@ function doGet(e) {
   }
   function render() {
     var now = Date.now();
-    ["home", "calendar", "progress", "level"].forEach(function (p) { $("page-" + p).hidden = ui.page !== p; });
-    document.body.classList.toggle("no-tabs", ui.page === "level");
+    ["home", "calendar", "progress", "level", "focus", "auth"].forEach(function (p) { $("page-" + p).hidden = ui.page !== p; });
+    document.body.classList.toggle("no-tabs", ui.page === "level" || ui.page === "focus" || ui.page === "auth");
     Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (b) {
       var on = b.getAttribute("data-page") === (ui.page === "level" ? "progress" : ui.page);
       if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
     });
     updateFab(now);
-    ({ home: renderHome, calendar: renderCalendar, progress: renderProgress, level: renderLevel })[ui.page](now);
+    ({ home: renderHome, calendar: renderCalendar, progress: renderProgress, level: renderLevel, focus: renderFocus, auth: renderAuth })[ui.page](now);
     var limit = Math.max.apply(null, state.settings.leads.concat([0])) * HOUR;
     var urgent = tasksArr().filter(function (t) { return !t.done && (t.due < now || t.due - now <= limit); }).length;
     document.title = urgent ? "(" + urgent + ") Due Board" : "Due Board";
@@ -1303,6 +1487,7 @@ function doGet(e) {
     $("a-extra").hidden = !t;
     if (t) { $("a-gcal").href = gcalUrl(t); $("a-gcal").hidden = t.done; var mb = !!(t.link && MB_LINK.test(t.link)); $("a-mb").hidden = !mb; if (mb) $("a-mb").href = t.link; }
     $("a-delete").hidden = !t;
+    $("a-focus").hidden = !t || t.done;
     $("add-edit-view").hidden = false; $("add-done-view").hidden = true;
     buildAddChips(quick); syncAdd();
     $("dlg-add").showModal();
@@ -1351,6 +1536,7 @@ function doGet(e) {
   $("add-x").addEventListener("click", function () { dlgClose("dlg-add"); });
   $("a-cancel").addEventListener("click", function () { dlgClose("dlg-add"); });
   $("a-delete").addEventListener("click", function () { var id = add.id; dlgClose("dlg-add"); if (id) removeTask(id); });
+  $("a-focus").addEventListener("click", function () { var id = add.id; dlgClose("dlg-add"); if (id) openFocus(id); });
   $("d-done").addEventListener("click", function () { dlgClose("dlg-add"); });
   $("d-again").addEventListener("click", function () { openAdd({ dateKey: add.dateKey }); });
   $("add-form").addEventListener("submit", function (e) {
@@ -1480,7 +1666,7 @@ function doGet(e) {
     if (words.join("|") !== state.settings.ignore.join("|")) { state.settings.ignore = words; persist(); }
   }
   function openSettings() {
-    renderLeads(); renderNotify(); fillPointInputs();
+    renderLeads(); renderNotify(); fillPointInputs(); renderAccount();
     $("s-ignore").value = state.settings.ignore.join(", ");
     $("s-sync").value = state.settings.syncUrl || "";
     $("s-tz").textContent = "Times are shown in your device's timezone: " + (Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown") + ".";
@@ -1572,7 +1758,7 @@ function doGet(e) {
     }).then(function () { syncing = false; });
   }
   function maybeSync() { if (state.settings.syncUrl && Date.now() - lastSyncTry > 15 * 60000) syncNow(); }
-  function afterBoot() { if (booted) return; booted = true; maybeSync(); }
+  function afterBoot() { if (booted) return; booted = true; maybeSync(); restoreFocus(); }
   $("s-sync-go").addEventListener("click", function () {
     var v = $("s-sync").value.trim();
     if (!isSyncUrl(v)) { $("sync-msg").textContent = "That should be the web app address from Google: it starts with https://script.google.com/macros/s/ and ends with /exec?key=your-phrase"; return; }
@@ -1621,41 +1807,446 @@ function doGet(e) {
   setInterval(tick, 60000);
   document.addEventListener("visibilitychange", function () { if (!document.hidden) tick(); });
 
+  // ================= accounts (only on a site that has a Firebase config) =================
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsRemove(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  var fbAuth = null, fbDb = null, pendingName = "", authTab = "signin", authNotice = null, authBusy = false;
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script"); s.src = src; s.onload = resolve; s.onerror = function () { reject(new Error(src)); };
+      document.head.appendChild(s);
+    });
+  }
+  function initFirebase() {
+    return loadScript("vendor/firebase-app-compat.js")
+      .then(function () { return loadScript("vendor/firebase-auth-compat.js"); })
+      .then(function () { return loadScript("vendor/firebase-firestore-compat.js"); })
+      .then(function () {
+        firebase.initializeApp(FB);
+        fbAuth = firebase.auth(); fbDb = firebase.firestore();
+        var emu = window.DUEBOARD_EMULATORS;   // only set by the test harness
+        if (emu) { fbAuth.useEmulator(emu.auth, { disableWarnings: true }); fbDb.useEmulator(emu.firestoreHost, emu.firestorePort); }
+        fbAuth.onAuthStateChanged(onAuthChanged);
+        refreshAuthForm();
+      });
+  }
+  function onAuthChanged(user) {
+    if (user) {
+      acct = { uid: user.uid, email: user.email || "", name: user.displayName || pendingName || "", verified: !!user.emailVerified };
+      lsSet(MODE_KEY, "account"); lsSet(LASTUID_KEY, user.uid);
+      var guest = null;
+      try { var g = lsGet(CACHE_KEY); guest = g ? normalize(JSON.parse(g)) : null; } catch (e) { guest = null; }
+      var hasGuest = !!(guest && (Object.keys(guest.tasks).length || guest.points));
+      var name = pendingName; pendingName = "";
+      follow(fbDb.collection("users").doc(user.uid), "firebase", "dueboard:u:" + user.uid, function () {
+        // A new account (or one with no data yet).
+        state = normalize(null); state.profile.name = name || acct.name || "";
+        if (hasGuest) openMove(guest); else persist();
+        render();
+      });
+      authBusy = false;
+      if (ui.page === "auth") ui.page = "home";
+      render();
+    } else {
+      acct = null;
+      if (unsub) { unsub(); unsub = null; }
+      store = { kind: "local", doc: null, key: CACHE_KEY }; saving = false; dirty = false;
+      if (lsGet(MODE_KEY) === "guest") { startGuest(); render(); return; }
+      state = normalize(null); mode = "starting";
+      ui.page = "auth"; render();
+    }
+  }
+  function authErr(e) {
+    var c = (e && e.code) || "";
+    var m = {
+      "auth/invalid-email": "That email address does not look right.", "auth/missing-email": "Type your email address.",
+      "auth/user-not-found": "Email or password is not right.", "auth/wrong-password": "Email or password is not right.",
+      "auth/invalid-credential": "Email or password is not right.", "auth/invalid-login-credentials": "Email or password is not right.",
+      "auth/email-already-in-use": "There is already an account with this email. Sign in instead.",
+      "auth/weak-password": "Use a longer password (at least 8 characters).",
+      "auth/too-many-requests": "Too many tries. Wait a minute, then try again.",
+      "auth/network-request-failed": "No connection. Check your internet and try again.",
+      "auth/requires-recent-login": "For safety, type your password again.", "auth/user-disabled": "This account has been switched off."
+    };
+    return m[c] || "Something went wrong" + (c ? " (" + c + ")" : "") + ". Try again.";
+  }
+
+  // ---- sign in / create account page ----
+  function showAuth(tab, notice) { authTab = tab || "signin"; authNotice = notice || null; $("page-auth").removeAttribute("data-built"); ui.page = "auth"; render(); }
+  function renderAuth() {
+    var page = $("page-auth");
+    if (page.getAttribute("data-built") === authTab) return;
+    page.setAttribute("data-built", authTab); page.textContent = "";
+    var create = authTab === "create";
+    var form = el("form", { class: "card", novalidate: true },
+      el("div", { class: "seg wide", role: "group", "aria-label": "Sign in or create an account" },
+        el("button", { type: "button", "aria-pressed": String(!create), text: "Sign in", onclick: function () { showAuth("signin"); } }),
+        el("button", { type: "button", "aria-pressed": String(create), text: "Create account", onclick: function () { showAuth("create"); } })),
+      create ? el("div", { class: "field" }, el("label", { for: "au-name", text: "Your name" }), el("input", { class: "inp", id: "au-name", type: "text", autocomplete: "name", maxlength: "60" })) : null,
+      el("div", { class: "field" }, el("label", { for: "au-email", text: "Email" }), el("input", { class: "inp", id: "au-email", type: "email", autocomplete: "email", inputmode: "email", maxlength: "200" })),
+      el("div", { class: "field" }, el("label", { for: "au-pw", text: "Password" }),
+        el("div", { class: "pw-wrap" },
+          el("input", { class: "inp", id: "au-pw", type: "password", autocomplete: create ? "new-password" : "current-password", maxlength: "200" }),
+          el("button", { class: "pw-toggle", type: "button", id: "au-show", text: "Show", "aria-label": "Show password", onclick: function () {
+            var i = $("au-pw"), show = i.type === "password"; i.type = show ? "text" : "password"; $("au-show").textContent = show ? "Hide" : "Show";
+          } })),
+        create ? el("span", { class: "hint", text: "At least 8 characters." }) : null),
+      el("p", { class: "note", id: "au-msg", role: "status", hidden: true }),
+      el("button", { class: "save", type: "submit", id: "au-go", text: create ? "Create account" : "Sign in" }),
+      create ? null : el("button", { class: "link-btn", type: "button", id: "au-forgot", text: "Forgot your password?", onclick: forgotPw }));
+    form.addEventListener("submit", function (e) { e.preventDefault(); submitAuth(create); });
+    page.append(el("div", { class: "auth" },
+      el("div", {}, el("span", { class: "eyebrow", text: "Homework, sorted" }), el("h1", { class: "brand-big", text: "Due Board" }),
+        el("p", { class: "tagline", text: "Your ManageBac deadlines, a calendar, focus sessions and points for finishing on time." })),
+      form,
+      el("div", { class: "guest-box" },
+        el("button", { class: "link-btn", type: "button", id: "au-guest", style: "align-self:center", text: "Continue without an account", onclick: useGuest }),
+        el("span", { class: "hint", text: "Your homework then stays on this device only." }))));
+    if (authNotice) { var n = authNotice; authNotice = null; authMsg(n.text, n.bad); }
+    refreshAuthForm();
+  }
+  function authMsg(text, bad) { var m = $("au-msg"); if (!m) return; m.textContent = text; m.className = "note" + (bad ? " bad" : " good"); m.hidden = !text; }
+  function refreshAuthForm() {
+    var go = $("au-go"); if (!go) return;
+    go.disabled = !fbAuth || authBusy;
+    go.textContent = !fbAuth ? "Loading sign-in..." : authBusy ? "Please wait..." : authTab === "create" ? "Create account" : "Sign in";
+  }
+  function submitAuth(create) {
+    if (!fbAuth || authBusy) return;
+    var email = $("au-email").value.trim(), pw = $("au-pw").value, name = create ? $("au-name").value.trim().slice(0, 60) : "";
+    if (create && !name) return authMsg("Type your name.", true);
+    if (!EMAIL_RE.test(email)) return authMsg("That email address does not look right.", true);
+    if (!pw) return authMsg("Type your password.", true);
+    if (create && pw.length < 8) return authMsg("Use a password with at least 8 characters.", true);
+    authBusy = true; authMsg("", false); refreshAuthForm();
+    var p;
+    if (create) {
+      pendingName = name;
+      p = fbAuth.createUserWithEmailAndPassword(email, pw).then(function (cred) {
+        return cred.user.updateProfile({ displayName: name }).then(function () {
+          if (acct) acct.name = name;
+          cred.user.sendEmailVerification().catch(function () {});
+        });
+      });
+    } else p = fbAuth.signInWithEmailAndPassword(email, pw);
+    p.catch(function (e) { pendingName = ""; authBusy = false; refreshAuthForm(); authMsg(authErr(e), true); });
+  }
+  function forgotPw() {
+    var email = $("au-email").value.trim();
+    if (!EMAIL_RE.test(email)) return authMsg("Type your email address above first, then tap Forgot your password.", true);
+    function ok() { authMsg("If there is an account for " + email + ", a link to reset the password is on its way.", false); }
+    fbAuth.sendPasswordResetEmail(email).then(ok, function (e) { if (e && e.code === "auth/user-not-found") ok(); else authMsg(authErr(e), true); });
+  }
+  function useGuest() { lsSet(MODE_KEY, "guest"); startGuest(); ui.page = "home"; render(); }
+
+  // ---- moving this device's homework into a new account ----
+  var moveData = null;
+  function openMove(guest) {
+    moveData = guest;
+    var n = Object.keys(guest.tasks).length;
+    $("move-text").textContent = "This device has " + n + (n === 1 ? " homework item" : " homework items") + " and " + guest.points + " points from before you signed in. Move them into your account?";
+    $("dlg-move").showModal();
+  }
+  $("move-yes").addEventListener("click", function () {
+    if (moveData) { var name = state.profile.name; state = moveData; state.profile.name = name || state.profile.name; state.rev = 0; persist(); lsRemove(CACHE_KEY); showToast("Moved into your account", null); }
+    moveData = null; dlgClose("dlg-move"); render();
+  });
+  $("move-no").addEventListener("click", function () { moveData = null; persist(); dlgClose("dlg-move"); render(); });
+  $("dlg-move").addEventListener("cancel", function (e) { e.preventDefault(); });   // a choice is needed
+
+  // ---- account section in Settings ----
+  function acctSay(t, bad) { var m = $("acct-msg"); if (!m) return; m.textContent = t; m.className = "note" + (bad ? " bad" : " good"); m.hidden = !t; }
+  function renderAccount() {
+    var box = $("acct-in"); box.textContent = "";
+    $("sect-account").hidden = !FB;
+    if (!FB) return;
+    if (!acct) {
+      box.append(
+        el("p", { class: "hint", text: "You are using Due Board without an account, so your homework is only on this device. With an account it is saved online and follows you to any phone or computer." }),
+        el("div", { class: "btn-row" },
+          el("button", { class: "btn-s go", type: "button", id: "acct-create", text: "Create account", onclick: function () { dlgClose("dlg-settings"); showAuth("create"); } }),
+          el("button", { class: "btn-s", type: "button", id: "acct-signin", text: "Sign in", onclick: function () { dlgClose("dlg-settings"); showAuth("signin"); } })));
+      return;
+    }
+    var shown = acct.name || state.profile.name || "";
+    var initials = (shown || acct.email || "?").split(/[\s@.]+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join("");
+    var nameIn = el("input", { class: "inp quiet", id: "acct-name", type: "text", maxlength: "60", value: shown, "aria-label": "Your name" });
+    var curPw = el("input", { class: "inp quiet", id: "acct-cur", type: "password", autocomplete: "current-password", placeholder: "Current password", "aria-label": "Current password" });
+    var newPw = el("input", { class: "inp quiet", id: "acct-new", type: "password", autocomplete: "new-password", placeholder: "New password (8+ characters)", "aria-label": "New password" });
+    var delPw = el("input", { class: "inp quiet", id: "acct-del-pw", type: "password", autocomplete: "current-password", placeholder: "Your password", "aria-label": "Password to confirm deletion" });
+    var danger = el("div", { class: "danger-box", id: "acct-danger", hidden: true },
+      el("p", { text: "This deletes your account and everything in it: homework, points, streaks and focus history. It cannot be undone." }),
+      delPw,
+      el("div", { class: "btn-row" },
+        el("button", { class: "btn-s solid-danger", type: "button", id: "acct-del-go", text: "Delete my account forever", onclick: function () { deleteAccount(delPw.value); } }),
+        el("button", { class: "btn-s", type: "button", id: "acct-del-cancel", text: "Keep my account", onclick: function () { danger.hidden = true; delPw.value = ""; } })));
+    box.append(
+      el("div", { class: "acct-head" }, el("span", { class: "avatar", "aria-hidden": "true", text: initials || "?" }),
+        el("div", { style: "min-width:0" }, el("b", { text: shown || "Your account" }), el("span", { text: acct.email }))),
+      acct.verified ? null : el("p", { class: "hint" }, "Your email is not verified yet. ",
+        el("button", { class: "link-btn", type: "button", id: "acct-verify", style: "min-height:32px", text: "Send the link again", onclick: function () {
+          fbAuth.currentUser.sendEmailVerification().then(function () { acctSay("Verification email sent.", false); }, function (e) { acctSay(authErr(e), true); });
+        } })),
+      el("div", { class: "field" }, el("label", { for: "acct-name", text: "Name" }),
+        el("div", { class: "inline" }, nameIn, el("button", { class: "btn-s", type: "button", id: "acct-name-save", text: "Save", onclick: function () { saveName(nameIn.value); } }))),
+      el("div", { class: "field" }, el("span", { class: "lab", text: "Change password" }), curPw, newPw,
+        el("div", { class: "btn-row" }, el("button", { class: "btn-s", type: "button", id: "acct-pw-go", text: "Change password", onclick: function () { changePw(curPw.value, newPw.value); } }))),
+      el("p", { class: "note", id: "acct-msg", role: "status", hidden: true }),
+      el("div", { class: "btn-row" },
+        el("button", { class: "btn-s", type: "button", id: "acct-signout", text: "Sign out", onclick: signOut }),
+        el("button", { class: "btn-s danger", type: "button", id: "acct-delete", text: "Delete account", onclick: function () { danger.hidden = false; delPw.focus(); } })),
+      danger);
+  }
+  function reauth(pw) { var u = fbAuth.currentUser; return u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, pw)); }
+  function saveName(name) {
+    name = name.trim().slice(0, 60);
+    if (!name) return acctSay("Type a name.", true);
+    fbAuth.currentUser.updateProfile({ displayName: name }).then(function () {
+      acct.name = name; state.profile.name = name; persist(); renderAccount(); acctSay("Name saved.", false);
+    }, function (e) { acctSay(authErr(e), true); });
+  }
+  function changePw(cur, nw) {
+    if (!cur) return acctSay("Type your current password.", true);
+    if (nw.length < 8) return acctSay("Use a new password with at least 8 characters.", true);
+    reauth(cur).then(function () { return fbAuth.currentUser.updatePassword(nw); })
+      .then(function () { renderAccount(); acctSay("Password changed.", false); }, function (e) { acctSay(authErr(e), true); });
+  }
+  function signOut() {
+    if (saving || dirty) return acctSay("Still saving your last change. Try again in a moment.", true);
+    var uid = acct && acct.uid;
+    lsRemove(MODE_KEY); lsRemove(LASTUID_KEY);
+    fbAuth.signOut().then(function () {
+      if (uid) lsRemove("dueboard:u:" + uid);   // nothing of this account stays on a shared computer
+      lsRemove(FOCUS_KEY); focus = null; stopTicker();
+      dlgClose("dlg-settings"); showAuth("signin", { text: "You are signed out.", bad: false });
+    }, function (e) { acctSay(authErr(e), true); });
+  }
+  function deleteAccount(pw) {
+    if (!pw) return acctSay("Type your password to confirm.", true);
+    var user = fbAuth.currentUser, uid = user.uid, go = $("acct-del-go");
+    if (go) go.disabled = true;
+    reauth(pw).then(function () {
+      if (unsub) { unsub(); unsub = null; }
+      store = { kind: "local", doc: null, key: CACHE_KEY }; saving = false; dirty = false;
+      return fbDb.collection("users").doc(uid).delete();
+    }).then(function () {
+      lsRemove(MODE_KEY); lsRemove(LASTUID_KEY);
+      return user.delete();
+    }).then(function () {
+      lsRemove("dueboard:u:" + uid); lsRemove(FOCUS_KEY); focus = null; stopTicker(); state = normalize(null);
+      dlgClose("dlg-settings"); showAuth("signin", { text: "Your account and all its data were deleted.", bad: false });
+    }, function (e) {
+      var b = $("acct-del-go"); if (b) b.disabled = false;
+      acctSay(authErr(e), true);
+      if (fbAuth.currentUser && !unsub) { lsSet(MODE_KEY, "account"); follow(fbDb.collection("users").doc(uid), "firebase", "dueboard:u:" + uid, null); }
+    });
+  }
+  function bootAccounts() {
+    var pref = lsGet(MODE_KEY), last = lsGet(LASTUID_KEY);
+    if (pref === "account" && last) {
+      // Show this device's copy straight away; the account takes over once it answers.
+      store = { kind: "firebase", doc: null, key: "dueboard:u:" + last };
+      try { var c = lsGet(store.key); state = c ? normalize(JSON.parse(c)) : normalize(null); } catch (e) { state = normalize(null); }
+      mode = "starting"; render();
+    } else if (pref === "guest") { startGuest(); render(); }
+    else { ui.page = "auth"; render(); }
+    initFirebase().catch(function () {
+      authMsg("Could not load sign-in. Check your connection and reload.", true);
+      if (pref !== "account") { refreshAuthForm(); }
+    });
+  }
+
+  // ================= focus mode =================
+  var focus = null, focusTimer = null, focusBuilt = "", wakeLock = null, audioCtx = null;
+  function saveFocus() { if (focus) lsSet(FOCUS_KEY, JSON.stringify(focus)); else lsRemove(FOCUS_KEY); }
+  function focusLeft() { return !focus ? 0 : focus.paused ? focus.remaining : focus.endAt - Date.now(); }
+  function openFocus(taskId) {
+    var t = state.tasks[taskId];
+    if (!t) return;
+    if (focus && focus.phase === "run") { setPage("focus"); return; }   // one session at a time
+    focus = { taskId: t.id, title: t.title, subject: t.subject, note: t.remaining || "", mins: 25, phase: "setup" };
+    saveFocus(); setPage("focus");
+  }
+  function startFocus() {
+    var n = $("fc-note"); if (n) focus.note = n.value.trim().slice(0, 140);
+    focus.phase = "run"; focus.paused = false; focus.startedAt = Date.now(); focus.endAt = Date.now() + focus.mins * 60000;
+    saveFocus(); keepAwake(true); primeSound(); render(); runTicker();
+  }
+  function togglePause() {
+    if (!focus || focus.phase !== "run") return;
+    if (focus.paused) { focus.endAt = Date.now() + focus.remaining; focus.paused = false; keepAwake(true); }
+    else { focus.remaining = Math.max(0, focus.endAt - Date.now()); focus.paused = true; keepAwake(false); }
+    saveFocus(); updateFocusClock();
+  }
+  // Records the minutes actually studied (pauses not counted) against the homework's subject.
+  function finishFocus(natural) {
+    if (!focus || focus.phase !== "run") return;
+    var left = Math.max(0, focusLeft()), studied = Math.round((focus.mins * 60000 - left) / 60000);
+    focus.studied = studied;
+    if (studied > 0) {
+      state.log.push({ k: "f", at: Date.now(), pts: 0, task: focus.taskId, title: focus.title, subject: focus.subject, how: "", day: "", mins: studied });
+      persist();
+    }
+    focus.phase = "ask"; focus.natural = !!natural; saveFocus(); keepAwake(false); stopTicker();
+    if (natural) alertDone();
+    render();
+  }
+  function focusDoneTask() {
+    var t = state.tasks[focus.taskId];
+    focus.phase = "done"; focus.result = "complete"; saveFocus();
+    if (t && !t.done) { t.remaining = ""; setDone(t, true); } else render();
+  }
+  function focusSaveLeft() {
+    var txt = $("fc-left").value.trim().slice(0, 300), t = state.tasks[focus.taskId];
+    if (t) { t.remaining = txt; persist(); }
+    focus.phase = "done"; focus.result = txt ? "left" : "none"; saveFocus(); render();
+  }
+  function closeFocus() { focus = null; saveFocus(); keepAwake(false); stopTicker(); setPage("home"); }
+  function renderFocus() {
+    var page = $("page-focus");
+    if (!focus) { focusBuilt = ""; page.textContent = ""; ui.page = "home"; render(); return; }
+    var sig = focus.phase + "|" + focus.taskId;
+    if (focusBuilt === sig) { updateFocusClock(); return; }
+    focusBuilt = sig; page.textContent = "";
+    var live = state.tasks[focus.taskId], t = live || { title: focus.title, subject: focus.subject };
+    page.append(
+      el("div", { class: "lv-head" },
+        el("button", { class: "icon-btn", type: "button", id: "fc-close", "aria-label": focus.phase === "run" ? "Back to Home, the timer keeps running" : "Close focus", onclick: function () { if (focus.phase === "run") setPage("home"); else closeFocus(); } }, ico("left", 20)),
+        el("h1", { text: "Focus" })),
+      el("div", { class: "focus-task" }, el("div", { class: "hero-meta" }, tagEl(t), live ? el("span", { text: "Due " + dueLabel(live) }) : null), el("span", { class: "t", text: focus.title })));
+    if (focus.phase === "setup") {
+      var dur = el("div", { class: "dur", role: "group", "aria-label": "Session length" });
+      [25, 45].forEach(function (m) {
+        dur.append(el("button", { type: "button", "data-m": String(m), "aria-pressed": String(focus.mins === m), "aria-label": m + " minutes", onclick: function () {
+          focus.mins = m; saveFocus();
+          Array.prototype.forEach.call(dur.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-m") === String(m))); });
+        } }, el("b", { text: String(m) }), el("span", { text: "MINUTES" })));
+      });
+      page.append(dur,
+        el("div", { class: "field" }, el("label", { for: "fc-note", text: "What will you work on?" }),
+          el("input", { class: "inp", id: "fc-note", type: "text", maxlength: "140", placeholder: "e.g. write the method section", value: focus.note || "" })),
+        el("button", { class: "fab", type: "button", id: "fc-start", style: "width:100%;box-shadow:none", onclick: startFocus }, ico("timer", 22, 2.4), "Start focus"),
+        el("p", { class: "hint", style: "text-align:center", text: "The timer keeps counting if you switch apps. You can pause at any time." }));
+    } else if (focus.phase === "run") {
+      page.append(
+        el("div", { class: "focus-ring", id: "fc-ring", role: "timer", "aria-label": "Time left" }, ringSvg(260, 112, 16, 100, "#F5B942", "#12443D"),
+          el("div", { class: "mid" }, el("b", { id: "fc-time", text: mmss(Math.max(0, focusLeft())) }), el("span", { id: "fc-of", text: "of " + focus.mins + " min" }))),
+        focus.note ? el("div", { class: "focus-desc" }, el("span", { text: "WORKING ON" }), focus.note) : null,
+        el("div", { class: "focus-actions" },
+          el("button", { class: "btn-outline-amber", type: "button", id: "fc-pause", onclick: togglePause }, focus.paused ? "Resume" : "Pause"),
+          el("button", { class: "btn-solid-teal", type: "button", id: "fc-done", onclick: function () { finishFocus(false); } }, "Session completed")),
+        el("div", { class: "discard" },
+          el("button", { class: "link-btn", type: "button", id: "fc-discard", style: "align-self:center", text: "Cancel without saving", onclick: function () { $("fc-discard").hidden = true; $("fc-discard-yes").hidden = false; $("fc-discard-no").hidden = false; } }),
+          el("button", { class: "btn-s danger", type: "button", id: "fc-discard-yes", hidden: true, text: "Yes, discard this session", onclick: closeFocus }),
+          el("button", { class: "btn-s", type: "button", id: "fc-discard-no", hidden: true, text: "Keep going", onclick: function () { $("fc-discard").hidden = false; $("fc-discard-yes").hidden = true; $("fc-discard-no").hidden = true; } })));
+      updateFocusClock();
+    } else if (focus.phase === "ask") {
+      page.append(
+        el("div", { class: "focus-q" }, el("div", { class: "badge" }, ico("check", 40, 3)),
+          el("h2", { text: focus.natural ? "Time's up" : "Session saved" }),
+          el("p", { id: "fc-recorded", text: focus.studied > 0 ? fmtMins(focus.studied).toLowerCase() + " recorded for " + (focus.subject || "this homework") + "." : "Less than a minute, so nothing was recorded." })),
+        el("h2", { class: "section-title", style: "text-align:center", text: "Did you make progress?" }),
+        el("div", { class: "choice" },
+          live && !live.done ? el("button", { class: "btn-solid-teal", type: "button", id: "fc-complete", onclick: focusDoneTask }, "Yes, it's finished: mark it complete") : null,
+          el("button", { class: "btn-outline-amber", type: "button", id: "fc-some", onclick: function () { $("fc-left-box").hidden = false; $("fc-left").focus(); } }, "Some progress: note what's left"),
+          el("div", { class: "field", id: "fc-left-box", hidden: true },
+            el("label", { for: "fc-left", text: "What's left to do?" }),
+            el("textarea", { class: "inp", id: "fc-left", maxlength: "300", placeholder: "e.g. conclusion and references", text: live ? live.remaining || "" : "" }),
+            el("button", { class: "save", type: "button", id: "fc-left-save", onclick: focusSaveLeft }, "Save what's left")),
+          el("button", { class: "ghost", type: "button", id: "fc-skip", onclick: function () { focus.phase = "done"; focus.result = "none"; saveFocus(); render(); } }, "Not really, skip")));
+    } else {
+      var msgs = { complete: "Marked complete. Nice work.", left: "Saved what's left. It shows on the homework until you finish it.", none: "Your study time is saved." };
+      page.append(
+        el("div", { class: "focus-q" }, el("div", { class: "badge" }, ico("check", 40, 3)), el("h2", { text: "All set" }), el("p", { id: "fc-result", text: msgs[focus.result] || msgs.none })),
+        el("div", { class: "choice" },
+          live && !live.done ? el("button", { class: "btn-outline-amber", type: "button", id: "fc-again", onclick: function () { var id = focus.taskId; focus = null; openFocus(id); } }, "Start another session") : null,
+          el("button", { class: "btn-solid-amber", type: "button", id: "fc-back", onclick: closeFocus }, "Back to homework")));
+    }
+  }
+  function updateFocusClock() {
+    if (!focus) return;
+    var left = Math.max(0, focusLeft()), t = $("fc-time");
+    if (t && ui.page === "focus") {
+      t.textContent = mmss(left);
+      var ring = $("fc-ring"), arc = ring.querySelectorAll("circle")[1];
+      ring.classList.toggle("paused", !!focus.paused);
+      if (arc) arc.setAttribute("stroke-dashoffset", (2 * Math.PI * 112 * (1 - left / (focus.mins * 60000))).toFixed(1));
+      $("fc-pause").textContent = focus.paused ? "Resume" : "Pause";
+      $("fc-of").textContent = focus.paused ? "Paused" : "of " + focus.mins + " min";
+    }
+    var b = $("fb-time"); if (b) b.textContent = mmss(left) + (focus.paused ? " · paused" : " left");
+  }
+  function focusBanner() {
+    if (!focus || (focus.phase !== "run" && focus.phase !== "ask")) return null;
+    var running = focus.phase === "run";
+    return el("button", { class: "card", type: "button", id: "focus-banner", style: "display:flex;align-items:center;gap:14px;border:2px solid #F5B942;text-align:left;color:inherit;width:100%;padding:14px 16px",
+        "aria-label": running ? "Return to your focus session" : "Finish your focus session", onclick: function () { setPage("focus"); } },
+      el("span", { style: "width:48px;height:48px;border-radius:50%;background:#F5B942;color:#0B2E29;display:grid;place-items:center;flex:none" }, ico("timer", 24, 2.4)),
+      el("span", { style: "display:flex;flex-direction:column;gap:2px;min-width:0" },
+        el("span", { class: "eyebrow", text: running ? "Focus session" : "Session finished" }),
+        el("b", { style: "overflow-wrap:anywhere", text: focus.title }),
+        el("span", { class: "small-muted", id: running ? "fb-time" : null, text: running ? mmss(Math.max(0, focusLeft())) + (focus.paused ? " · paused" : " left") : "Did you make progress? Tap to answer." })));
+  }
+  function runTicker() {
+    stopTicker();
+    focusTimer = setInterval(function () {
+      if (!focus || focus.phase !== "run") { stopTicker(); return; }
+      if (!focus.paused && focusLeft() <= 0) finishFocus(true); else updateFocusClock();
+    }, 500);
+  }
+  function stopTicker() { if (focusTimer) clearInterval(focusTimer); focusTimer = null; }
+  function restoreFocus() {
+    try { var f = JSON.parse(lsGet(FOCUS_KEY) || "null"); if (f && f.taskId && f.phase) focus = f; } catch (e) { focus = null; }
+    if (!focus) return;
+    if (focus.phase === "run") { if (!focus.paused && focusLeft() <= 0) finishFocus(true); else runTicker(); }
+    render();
+  }
+  function primeSound() {
+    try { var AC = window.AudioContext || window.webkitAudioContext; if (AC && !audioCtx) audioCtx = new AC(); if (audioCtx && audioCtx.state === "suspended") audioCtx.resume(); } catch (e) {}
+  }
+  function alertDone() {
+    try {
+      if (audioCtx) [0, 0.35, 0.7].forEach(function (d) {
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain(), t0 = audioCtx.currentTime + d;
+        o.frequency.value = 880; o.connect(g); g.connect(audioCtx.destination);
+        g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.3, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.3);
+        o.start(t0); o.stop(t0 + 0.32);
+      });
+    } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+    try { if (state.settings.notify && notifySupported() && Notification.permission === "granted") new Notification("Focus session done: " + focus.title, { body: "Did you make progress?" }); } catch (e) {}
+  }
+  function keepAwake(on) {
+    try {
+      if (on && navigator.wakeLock && !wakeLock) navigator.wakeLock.request("screen").then(function (l) { wakeLock = l; }, function () {});
+      if (!on && wakeLock) { wakeLock.release().catch(function () {}); wakeLock = null; }
+    } catch (e) {}
+  }
+
   // ================= boot =================
   loadFired();
-  try { var cached = localStorage.getItem(CACHE_KEY); if (cached) state = normalize(JSON.parse(cached)); } catch (e) {}
   try { var p = localStorage.getItem(PAGE_KEY); if (p === "calendar" || p === "progress") ui.page = p; } catch (e) {}
-  checkReminders(true);
-  render();
-
   if (window.claude && window.claude.use) {
     window.claude.use("downloads").then(function (d) { if (d) downloads = d; }, function () {});
   }
-  function startLocalOnly() { dbDoc = null; mode = "local"; setStatus(); afterBoot(); }
-  (function connect() {
-    if (!window.claude || !window.claude.use) { startLocalOnly(); return; }
+  function bootClaude() {
+    startGuest(); mode = "starting"; render();
     Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function (r) {
       var db = r[0], user = r[1];
-      if (!db || !user) { startLocalOnly(); return; }
+      if (!db || !user) { mode = "local"; setStatus(); return; }
       return user.id().then(function (uid) {
-        if (!uid) { startLocalOnly(); return; }
-        var doc = db.doc("data/users/" + uid + "/planner");
-        var first = true;
-        doc.onSnapshot(function (snap) {
-          if (saving || dirty || (snap.metadata && snap.metadata.hasPendingWrites)) return;
-          if (snap.exists) {
-            state = normalize(snap.data()); cacheLocal();
-            dbDoc = doc; if (!saving) { mode = "account"; setStatus(); }
-            checkReminders(first); render();
-          } else {
-            dbDoc = doc;
-            if (Object.keys(state.tasks).length) persist(); else { mode = "account"; setStatus(); }
-          }
-          first = false; afterBoot();
-        }, function () { startLocalOnly(); mode = "error"; setStatus(); });
+        if (!uid) { mode = "local"; setStatus(); return; }
+        follow(db.doc("data/users/" + uid + "/planner"), "claude", CACHE_KEY);
       });
-    }).catch(function () { startLocalOnly(); });
-  })();
+    }).catch(function () { mode = "local"; setStatus(); });
+  }
+  if (FB) bootAccounts();
+  else if (window.claude && window.claude.use) bootClaude();
+  else { startGuest(); render(); }
+  checkReminders(true);
 })();
 </script>
 <script>
