@@ -2,6 +2,12 @@
 
 A Telegram bot that watches your ManageBac calendar and messages you when homework is due.
 
+## Due Board website (free, no server)
+
+`docs/` is a complete static website: the Due Board app (Home, Calendar, Progress), installable on a phone and usable offline. Each visitor's homework is stored only in their own browser, so there is nothing to host or pay for.
+
+To publish it on GitHub Pages: repository **Settings → Pages → Build and deployment → Source: Deploy from a branch**, choose this repository's branch and the **/docs** folder, then Save. The address then shows at the top of that page (normally `https://<owner>.github.io/<repository>/`).
+
 ## How it connects to ManageBac
 
 ManageBac's public API needs a token issued by a school **administrator**, so students can't use it. Instead the bot uses the **calendar subscription link** that every student can copy from ManageBac (the same link you'd give Google Calendar). The bot downloads that iCal feed every 15 minutes.
