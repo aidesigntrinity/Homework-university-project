@@ -1,0 +1,15 @@
+{
+  "name": "due-board-tests",
+  "private": true,
+  "description": "Test-only packages for Due Board. The website itself needs no install or build.",
+  "scripts": {
+    "unit": "node --test .",
+    "e2e": "node e2e/guest.e2e.js",
+    "fake-supabase": "node e2e/fake-supabase.js",
+    "accounts": "node e2e/accounts.e2e.js"
+  },
+  "devDependencies": {
+    "axe-core": "4.14.0",
+    "pg": "8.23.1"
+  }
+}
