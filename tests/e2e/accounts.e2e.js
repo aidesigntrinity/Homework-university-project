@@ -182,6 +182,19 @@ const lastMail = async (type, email) => (await outbox()).filter((m) => m.type ==
     ok("signing up with an email that already has an account doesn't reveal it, and points to signing in instead");
     await E.ctx.close();
 
+    // ---------- confirming on another device signs the first one in ----------
+    const F = await page(); const f = F.p;
+    await f.goto(BASE); await f.waitForSelector("#au-go");
+    await f.click(".auth-card .seg button:has-text('Create account')");
+    await f.fill("#au-name", "Sam"); await f.fill("#au-email", "sam@example.com"); await f.fill("#au-pw", "sampassword1"); await f.click("#au-go");
+    await H.until(f, () => /signs you in by itself/.test(document.querySelector(".auth-card").textContent));
+    await f.click("#au-confirmed");
+    await H.until(f, () => /Not confirmed yet/.test(document.querySelector(".toasts").textContent));
+    const G = await page(); await G.p.goto((await lastMail("signup", "sam@example.com")).link);   // the link, opened on another device
+    await H.until(f, () => DB.app && DB.app.mode === "account" && location.hash === "#/home", null, 15000);
+    ok("after signing up, opening the email link on another device signs the first device in by itself (no redirect needed)");
+    await F.ctx.close(); await G.ctx.close();
+
     // ---------- delete account ----------
     await a.goto(BASE + "#/settings/account"); await a.waitForSelector("#acct-delete");
     await a.click("#acct-delete"); assert.ok(await a.isVisible("#acct-danger"));
@@ -190,10 +203,10 @@ const lastMail = async (type, email) => (await outbox()).filter((m) => m.type ==
     await H.until(a, () => /Type your password/.test(document.querySelector("#acct-del-msg").textContent));
     await a.fill("#acct-del-pw", "wrong-one-1"); await a.click("#acct-del-go");
     await H.until(a, () => /That password is not right/.test(document.querySelector("#acct-del-msg").textContent));
-    assert.ok((await serverItems()).length > 0);
+    assert.ok((await serverItems()).some((i) => i.email === "alex@example.com"));
     await a.fill("#acct-del-pw", "brandnew789"); await a.click("#acct-del-go");
     await H.until(a, () => location.hash === "#/welcome" && /were deleted/.test(document.querySelector(".toasts").textContent));
-    assert.strictEqual((await serverItems()).length, 0);
+    assert.strictEqual((await serverItems()).filter((i) => i.email === "alex@example.com").length, 0);
     assert.strictEqual((await (await fetch(SB + "/__test/sql", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sql: "select count(*)::int as n from auth.users where email = 'alex@example.com'" }) })).json())[0].n, 0);
     assert.deepStrictEqual(await a.evaluate(() => Object.keys(localStorage).filter((k) => /^dueboard:v4:u:/.test(k))), []);
     ok("delete account: Cancel works, the password is required and checked; then the account, all its data and this device's copy are gone");

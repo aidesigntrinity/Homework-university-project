@@ -25,8 +25,9 @@
         U.btn("Get started", { kind: "primary", size: "lg", block: true, onclick: () => App.continueAsGuest() }));
     } else if (tab === "sent") {
       U.add(card, el("div", { class: "empty" }, el("div", { class: "em-ic" }, icon("mail")), el("h3", { text: notice.title }), el("p", { text: notice.text }),
+        notice.check ? U.btn("I've confirmed: sign me in", { kind: "primary", size: "sm", id: "au-confirmed", onclick: async (e) => { const btnEl = e.currentTarget; btnEl.disabled = true; try { await notice.check(); } catch (err) { U.toast(/confirm your email/i.test(A.friendly(err)) ? "Not confirmed yet. Open the link in the email first." : A.friendly(err), { icon: "alert" }); } finally { btnEl.disabled = false; } } }) : null,
         notice.resend ? U.btn("Send it again", { kind: "outline", size: "sm", onclick: async (e) => { const btnEl = e.currentTarget; btnEl.disabled = true; try { await notice.resend(); U.toast("Sent again"); } catch (err) { U.toast(A.friendly(err), { icon: "alert" }); } } }) : null),
-        U.btn("Back to sign in", { kind: "ghost", block: true, onclick: () => { tab = "signin"; App.render(); } }));
+        U.btn("Back to sign in", { kind: "ghost", block: true, onclick: () => { tab = "signin"; stopWatch(); App.render(); } }));
     } else {
       U.add(card, el("div", null, el("h2", { text: tab === "signup" ? "Create your account" : tab === "forgot" ? "Reset password" : tab === "magic" ? "Email me a link" : "Welcome back" }),
         el("p", { class: "muted", style: { marginTop: "6px" }, text: tab === "signup" ? "Free. Your homework syncs across your devices." : tab === "forgot" ? "We'll email you a link to set a new password." : tab === "magic" ? "We'll email you a link that signs you in, no password needed." : "Sign in to see your homework on any device." })));
@@ -56,7 +57,13 @@
           if (tab === "signin") { await A.signIn(em, pw.value); return; }
           if (tab === "signup") {
             const r = await A.signUp(em, pw.value, name.value.trim());
-            if (r.needsConfirm) { tab = "sent"; notice = { title: "Check your email", text: r.exists ? "If " + em + " doesn't have an account yet, we've sent a link to confirm it. If it does, sign in instead (or reset your password)." : "We sent a link to " + em + ". Open it to confirm your account, then you're in. Check spam if you can't find it.", resend: () => A.resend(em) }; App.render(); }
+            if (r.needsConfirm) {
+              tab = "sent";
+              notice = { title: "Check your email", text: r.exists ? "If " + em + " doesn't have an account yet, we've sent a link to confirm it. If it does, sign in instead (or reset your password)."
+                : "We sent a link to " + em + ". Open it on any device (check spam too). This page signs you in by itself once it's confirmed, even if the link ends on an error page.", resend: () => A.resend(em), check: () => A.signIn(em, pw.value) };
+              watchConfirm(notice.check);
+              App.render();
+            }
             return;
           }
           if (tab === "forgot") { await A.resetPassword(em); tab = "sent"; notice = { title: "Check your email", text: "If there's an account for " + em + ", a link to reset the password is on its way." }; App.render(); return; }
@@ -75,6 +82,21 @@
       U.btn(App.guest && !App.guest.isEmpty() ? "Continue without an account" : "Continue without an account", { kind: "outline", size: "lg", block: true, id: "au-guest", onclick: () => App.continueAsGuest() }),
       el("p", { class: "xs muted", style: { textAlign: "center" }, text: "Without an account, homework is saved in this browser only." }));
     U.add(page, el("div", { class: "auth" }, brand, el("div", { class: "auth-main" }, card)));
+  }
+  // After signing up, quietly try signing in until the email is confirmed (on this or another device), so
+  // the student doesn't depend on where the confirmation link sends them. The password stays in memory only.
+  let watchTimer = null, watchUntil = 0, watchFn = null;
+  function stopWatch() { clearInterval(watchTimer); watchTimer = null; watchFn = null; document.removeEventListener("visibilitychange", onVisible); }
+  function onVisible() { if (!document.hidden && watchFn) tryNow(); }
+  async function tryNow() {
+    if (!watchFn || Date.now() > watchUntil || DB.account.user) { stopWatch(); return; }
+    try { await watchFn(); stopWatch(); tab = "signin"; notice = null; } catch (e) { /* not confirmed yet */ }
+  }
+  function watchConfirm(fn) {
+    stopWatch();
+    watchFn = fn; watchUntil = Date.now() + 20 * 60000;
+    watchTimer = setInterval(tryNow, 6000);
+    document.addEventListener("visibilitychange", onVisible);
   }
   function feat(ic, t, d) { return el("li", null, el("span", { class: "fi" }, icon(ic)), el("div", null, el("b", { text: t }), el("span", { text: d }))); }
   function show(which, n) { tab = which || "signin"; notice = n || null; DB.app.go("welcome"); }
