@@ -21,7 +21,7 @@
   function defaultSettings() {
     return {
       theme: "system", startPage: "home", weekStart: 1, density: "comfortable",
-      leads: [24, 3], notify: false, remindDefault: true, ignore: [], syncUrl: "", removeMissing: true,
+      leads: [24, 3, 0.5], notify: false, remindDefault: true, reminderSound: true, ignore: [], syncUrl: "", removeMissing: true,
       pts: Object.assign({}, C.DEFAULT_PTS), names: C.DEFAULT_NAMES.slice(), subjectColors: {},
       focus: { mins: 25, pomodoro: false, cycles: 4, short: 5, long: 15, sound: true },
       goals: { daily: 60, weekly: 300 }, capacity: 120, defaultEst: 30, homeSort: "due", mod: 0,
@@ -34,8 +34,8 @@
     if (["home", "calendar", "planner", "progress", "focus"].indexOf(s.startPage) !== -1) o.startPage = s.startPage;
     if (s.weekStart === 0 || s.weekStart === 1) o.weekStart = s.weekStart;
     if (s.density === "compact") o.density = "compact";
-    if (Array.isArray(s.leads)) o.leads = s.leads.map(Number).filter((n) => n > 0 && n <= 336).sort((a, b) => b - a).slice(0, 6);
-    o.notify = !!s.notify; o.remindDefault = s.remindDefault !== false; o.removeMissing = s.removeMissing !== false;
+    if (Array.isArray(s.leads)) o.leads = C.cleanLeads(s.leads);
+    o.notify = !!s.notify; o.remindDefault = s.remindDefault !== false; o.reminderSound = s.reminderSound !== false; o.removeMissing = s.removeMissing !== false;
     if (Array.isArray(s.ignore)) o.ignore = s.ignore.map((w) => str(w, 40).trim()).filter(Boolean).slice(0, 30);
     o.syncUrl = C.isSyncUrl(s.syncUrl) ? s.syncUrl : "";
     if (s.pts && typeof s.pts === "object") ["early", "onTime", "late", "streak"].forEach((k) => { o.pts[k] = int(s.pts[k], 0, 100, o.pts[k]); });
@@ -63,7 +63,7 @@
     t.priority = int(x.priority, 0, 3, 0); t.est = int(x.est, 0, 1440, 0); t.notes = str(x.notes, 4000);
     t.subtasks = Array.isArray(x.subtasks) ? x.subtasks.slice(0, 50).map((s) => ({ id: str(s && s.id, 40) || C.newId("s"), text: str(s && s.text, 200), done: !!(s && s.done), due: time(s && s.due) })).filter((s) => s.text) : [];
     t.links = Array.isArray(x.links) ? x.links.slice(0, 12).map((l) => ({ url: C.safeUrl(l && l.url), title: str(l && l.title, 120) })).filter((l) => l.url) : [];
-    t.reminders = Array.isArray(x.reminders) ? x.reminders.map(Number).filter((n) => n > 0 && n <= 336).slice(0, 6) : null;
+    t.reminders = Array.isArray(x.reminders) ? C.cleanLeads(x.reminders) : null;
     t.source = x.source === "managebac" ? "managebac" : "manual";
     t.feedKey = str(x.feedKey, 300); t.url = C.safeUrl(x.url);
     t.mb = x.mb && typeof x.mb === "object" ? { title: str(x.mb.title, 200), subject: str(x.mb.subject, 40), due: time(x.mb.due), allDay: !!x.mb.allDay, notes: str(x.mb.notes, 4000) } : null;

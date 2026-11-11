@@ -13,6 +13,7 @@ It is a static website: no build step and no server code of its own. Accounts an
 - **Focus:** 25, 45, 60 minutes or a custom length; Pomodoro cycles with short and long breaks; pause; "Session completed"; *Did you make progress?* (mark complete, tick steps and note what's left, or skip). Study minutes are recorded per subject, with daily and weekly goals and a session history. The timer survives reloads and closing the app: a block that ended while the app was closed is recorded at the time it ended.
 - **Progress:** points, level, completion rate (30 days), on-time rate, current and best streak, last 7 days and last 6 months (homework and study time), study goals, study time by subject, a subjects table, a 26-week activity map, 14 achievements and full history.
 - **Archive:** completed, archived, removed-in-ManageBac and deleted homework. Everything can be restored.
+- **Reminders:** a pop-up before homework is due (10, 15, 30 minutes, 1–12 hours, 1–2 days before, or any custom time), with Open, Mark done, Snooze 10 min and Dismiss, an optional chime, and system alerts when the tab is in the background. Set defaults in Settings → Notifications ("Show a test reminder" previews it) or per homework in its editor.
 - **Search:** press `/` or `Ctrl K` anywhere. Searches titles, subjects, notes, checklists and links, including finished work.
 - **Settings:** account, sync, ManageBac, notifications, appearance (light, dark or match device; density; start page; week start), personal (name, subject colours and renaming, study goals, planner capacity), points and level names, data and backup, privacy.
 - **Works offline** and installs to a phone's home screen. Keyboard shortcuts: `N` new homework, `/` search, `1`–`5` switch screens, `?` list.
@@ -87,11 +88,11 @@ tools/                single-file build
 ## Tests
 
 ```
-node --test tests/                      # 36 unit tests: calendar parsing and reconciliation, points, streaks, recurrence, planning, store, upgrades, sync merging, backups
+node --test tests/                      # 38 unit tests: calendar parsing and reconciliation, points, streaks, recurrence, planning, store, upgrades, sync merging, backups
 cd tests && npm install                 # test-only packages (pg, axe-core); Playwright is also needed
-node tests/e2e/guest.e2e.js             # 20 browser checks without an account, incl. layouts at 3 sizes, both themes and axe accessibility
+node tests/e2e/guest.e2e.js             # 22 browser checks without an account (incl. reminder pop-ups), incl. layouts at 3 sizes, both themes and axe accessibility
 node tests/e2e/fake-supabase.js &       # local stand-in for Supabase Auth + REST, running the real SQL on a local Postgres
-node tests/e2e/accounts.e2e.js          # 16 browser checks: sign-up, confirmation, two devices, conflicts, offline, errors, password reset, sign-in links, moving guest data, delete account
+node tests/e2e/accounts.e2e.js          # 17 browser checks: sign-up, confirmation, two devices, conflicts, offline, errors, password reset, sign-in links, moving guest data, delete account
 ```
 
 The account tests use `tests/e2e/supabase-stub.sql` plus the migration on a local PostgreSQL (port 54329, database `dueboard`). Supabase Realtime isn't emulated; the app falls back to checking every minute and when the page regains focus.

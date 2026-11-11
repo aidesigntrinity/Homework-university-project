@@ -5,7 +5,6 @@
   const { el, icon } = U;
   const QUICK_TIMES = ["08:00", "09:30", "12:00", "16:00", "23:59"];
   const EST = [15, 30, 45, 60, 90, 120];
-  const LEADS = [1, 3, 6, 12, 24, 48];
 
   function open(id, preset) {
     const App = DB.app, S = App.store, now = App.now(), st = S.settings();
@@ -103,14 +102,10 @@
 
     // ----- reminders, repeat, plan -----
     const useDefault = w.reminders === null;
-    let rem = useDefault ? st.leads.slice() : w.reminders.slice();
-    const remChips = el("div", { class: "chips" });
-    function drawRem() {
-      U.fill(remChips, ...LEADS.map((h) => el("button", { class: "chip", type: "button", "aria-pressed": String(rem.indexOf(h) !== -1), onclick: () => {
-        const i = rem.indexOf(h); if (i === -1) rem.push(h); else rem.splice(i, 1); rem.sort((a, b) => b - a); w.reminders = rem.slice(); remDef.setAttribute("aria-checked", "false"); drawRem(); } }, h < 24 ? h + " h" : h / 24 + (h === 24 ? " day" : " days"))));
-    }
-    const remDef = U.switchEl(useDefault && st.remindDefault, "Use my default reminders", (v) => { w.reminders = v ? null : rem.slice(); if (v) { rem = st.leads.slice(); drawRem(); } }, "e-remdef");
-    drawRem();
+    // Picking a time here gives this homework its own reminders; the switch goes back to the defaults.
+    const remPick = U.leadPicker({ id: "e-rem", label: "Reminder times for this homework", selected: useDefault ? st.leads : w.reminders,
+      onchange: (list) => { w.reminders = list; remDef.setAttribute("aria-checked", "false"); } });
+    const remDef = U.switchEl(useDefault && st.remindDefault, "Use my default reminders", (v) => { w.reminders = v ? null : st.leads.slice(); remPick.setSelected(st.leads); }, "e-remdef");
     const recur = U.select([{ v: "", label: "Doesn't repeat" }].concat(Object.keys(C.RECUR).map((k) => ({ v: k, label: C.RECUR[k] }))), w.recur ? w.recur.freq : "", (v) => { w.recur = v ? { freq: v, until: w.recur ? w.recur.until : 0 } : null; untilBox.hidden = !v; }, { id: "e-recur" });
     const until = el("input", { class: "input", type: "date", id: "e-until", value: w.recur && w.recur.until ? C.dayKey(w.recur.until) : "" });
     const untilBox = U.field("Repeat until (optional)", until);
@@ -139,8 +134,8 @@
         U.field("Notes", notes),
         el("div", { class: "form-sect" }, el("span", { class: "label" }, icon("link"), "Links"), linkList, el("div", { class: "row" }, el("div", { class: "grow" }, linkIn), U.btn("Add", { size: "sm", onclick: addLink })), linkErr),
         el("div", { class: "form-sect" }, el("span", { class: "label" }, icon("bell"), "Reminders"),
-          el("div", { class: "switch-row", style: { padding: 0 } }, el("span", { class: "small", text: "Use my default reminders (" + (st.leads.length ? st.leads.map((h) => h + " h").join(", ") + " before" : "none set") + ")" }), remDef),
-          el("span", { class: "hint small muted", text: "Or pick when to be reminded before it's due:" }), remChips,
+          el("div", { class: "switch-row", style: { padding: 0 } }, el("span", { class: "small", text: "Use my default reminders (" + (st.leads.length ? st.leads.map(C.fmtLead).join(", ") + " before" : "none set") + ")" }), remDef),
+          el("span", { class: "hint small muted", text: "Or pick when to be reminded before it's due:" }), remPick,
           el("span", { class: "hint xs dim", text: "Reminders appear while Due Board is open. For alerts on your phone, add homework to Google Calendar." })),
         el("div", { class: "field-row stack-sm" }, U.field("Repeat", recur), untilBox)));
     U.add(s.body, 

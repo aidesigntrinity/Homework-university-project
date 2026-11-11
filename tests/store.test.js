@@ -192,3 +192,11 @@ test("settings are validated", () => {
   const s = St.cleanSettings({ theme: "neon", pts: { early: 9999 }, focus: { mins: 2 }, syncUrl: "https://evil.example.com", names: [] });
   assert.equal(s.theme, "system"); assert.equal(s.pts.early, 100); assert.equal(s.focus.mins, 5); assert.equal(s.syncUrl, ""); assert.equal(s.names.length, 8);
 });
+
+test("reminder settings keep minute-level times and the sound switch", () => {
+  const s = St.cleanSettings({ leads: [0.5, 10 / 60, 24], reminderSound: false });
+  assert.deepEqual(s.leads, [24, 0.5, C.cleanLead(10 / 60)]); assert.equal(s.reminderSound, false);
+  assert.deepEqual(St.defaultSettings().leads, [24, 3, 0.5]);
+  const t = St.cleanTask({ id: "a", title: "x", due: NOW, reminders: [0.25] });
+  assert.deepEqual(t.reminders, [0.25]);
+});

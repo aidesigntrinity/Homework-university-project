@@ -206,21 +206,23 @@ function doGet(e) {
       const App = DB.app, S = ctx.store, st = S.settings();
       const supported = App.notifySupported(), perm = supported ? Notification.permission : "unsupported";
       const status = el("p", { class: "small muted", id: "notify-status" });
-      const sw = U.switchEl(st.notify && perm === "granted", "Pop-up alerts", (v) => {
+      const sw = U.switchEl(st.notify && perm === "granted", "System alerts", (v) => {
         if (!v) { S.setSettings({ notify: false }); return; }
         if (!supported) return;
         const done = (pp) => { S.setSettings({ notify: pp === "granted" }); if (pp !== "granted") U.toast("Alerts are blocked. Allow notifications for this site in your browser settings."); };
         try { const r = Notification.requestPermission(done); if (r && r.then) r.then(done); } catch (e) { done("denied"); }
       }, "set-notify");
       if (!supported || perm === "denied") sw.disabled = true;
-      status.textContent = !supported ? "This browser can't show pop-up alerts. Reminders still appear inside Due Board." : perm === "denied" ? "Alerts are blocked for this site. Allow them in your browser settings, then reload." : "Pop-ups appear while Due Board is open in a tab, even in the background.";
-      const leads = el("div", { class: "chips" }, [1, 3, 6, 12, 24, 48].map((h) => el("button", { class: "chip", type: "button", "aria-pressed": String(st.leads.indexOf(h) !== -1), onclick: () => {
-        const l = st.leads.slice(), i = l.indexOf(h); if (i === -1) l.push(h); else l.splice(i, 1); S.setSettings({ leads: l.sort((a, b) => b - a) }); } }, h < 24 ? h + " h before" : h / 24 + (h === 24 ? " day before" : " days before"))));
-      U.add(p, card("Reminders", null,
-        el("div", { class: "switch-row" }, el("div", { class: "grow" }, el("div", { class: "t", text: "Pop-up alerts" }), status), sw),
-        U.switchRow("Remind me about new homework", "Use the default reminder times below for homework that doesn't set its own.", st.remindDefault, (v) => S.setSettings({ remindDefault: v })),
-        el("div", { class: "form-sect" }, el("span", { class: "label", text: "Default reminder times" }), leads),
-        el("p", { class: "small muted", text: "Browsers can't wake a closed web page, so reminders appear while Due Board is open. For reminders when it's closed, export to Google Calendar (Settings → ManageBac)." })));
+      status.textContent = !supported ? "This browser can't show system alerts. Reminders still pop up inside Due Board." : perm === "denied" ? "Alerts are blocked for this site. Allow them in your browser settings, then reload." : "Also shows reminders as system alerts when Due Board is open in a background tab.";
+      const leads = U.leadPicker({ id: "set-leads", label: "Default reminder times", selected: st.leads, onchange: (list) => S.setSettings({ leads: list }) });
+      U.add(p, card("Reminders", "A reminder pops up before homework is due and stays until you open it, snooze it or dismiss it.",
+        el("div", { class: "form-sect" }, el("span", { class: "label", text: "Remind me before it's due" }), leads,
+          el("span", { class: "hint xs dim", text: "Pick as many as you like, or add your own with Custom (for example 45 minutes). Each homework can also have its own times in its editor." })),
+        U.switchRow("Remind me about new homework", "Use these times for homework that doesn't set its own.", st.remindDefault, (v) => S.setSettings({ remindDefault: v })),
+        U.switchRow("Play a sound", "A short chime when a reminder pops up.", st.reminderSound, (v) => S.setSettings({ reminderSound: v }), "set-rem-sound"),
+        el("div", { class: "switch-row" }, el("div", { class: "grow" }, el("div", { class: "t", text: "System alerts" }), status), sw),
+        el("div", null, U.btn("Show a test reminder", { icon: "bell", id: "set-rem-test", onclick: () => App.testReminder() })),
+        el("p", { class: "small muted", text: "Browsers can't wake a closed web page, so reminders appear while Due Board is open in a tab. For reminders when it's closed, export to Google Calendar (Settings → ManageBac)." })));
       U.add(p, card("Focus sounds", null, U.switchRow("Play a sound when a focus block or break ends", null, st.focus.sound, (v) => S.setSettings({ focus: Object.assign({}, st.focus, { sound: v }) }))));
     },
 

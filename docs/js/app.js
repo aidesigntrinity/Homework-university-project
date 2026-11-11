@@ -297,34 +297,89 @@
   };
 
   // ---------- reminders (while the app is open) ----------
-  let fired = {};
+  // Each reminder fires once per homework, time and due date (remembered on this device in FIRED_KEY).
+  // It pops up as a card that stays until it's opened, snoozed, marked done or dismissed; in a background
+  // tab it is also sent as a system alert when those are switched on.
+  const SNOOZE_KEY = "dueboard:snooze";
+  let fired = {}, snoozed = {};
   try { fired = JSON.parse(ls.get(FIRED_KEY) || "{}") || {}; } catch (e) { fired = {}; }
+  try { snoozed = JSON.parse(ls.get(SNOOZE_KEY) || "{}") || {}; } catch (e) { snoozed = {}; }
   App.notifySupported = () => typeof Notification !== "undefined";
   function checkReminders(quiet) {
     if (!App.store) return;
     const now = App.now(), st = App.store.settings(), due = [];
     App.store.activeTasks().forEach((t) => {
       if (t.done || t.due < now) return;
+      if (snoozed[t.id]) {
+        if (snoozed[t.id] <= now) { delete snoozed[t.id]; due.push(t); }
+        return;
+      }
       const leads = t.reminders === null ? (st.remindDefault ? st.leads : []) : t.reminders;
       leads.forEach((h) => {
         const k = t.id + "|" + h + "|" + t.due;
         if (fired[k] || t.due - now > h * C.HOUR) return;
-        fired[k] = now; due.push(t);
+        fired[k] = now;
+        if (due.indexOf(t) === -1) due.push(t);
       });
     });
     if (!due.length) return;
     const cut = now - 7 * C.DAY;
     Object.keys(fired).forEach((k) => { if (fired[k] < cut) delete fired[k]; });
-    ls.set(FIRED_KEY, JSON.stringify(fired));
-    const uniq = due.filter((t, i) => due.indexOf(t) === i);
-    if (quiet && uniq.length > 2) { U.toast(uniq.length + " deadlines are coming up", { icon: "bell", detail: uniq.slice(0, 3).map((t) => t.title).join(", ") }); return; }
-    uniq.forEach((t) => {
-      const text = "Due " + C.countdown(t.due - now) + ": " + t.title;
-      if (st.notify && App.notifySupported() && Notification.permission === "granted" && document.hidden) {
-        try { new Notification(text, { body: [t.subject, C.dueLabel(t)].filter(Boolean).join(" · "), tag: t.id }); } catch (e) { U.toast(text, { icon: "bell" }); }
-      } else U.toast(text, { icon: "bell", action: { label: "Open", run: () => App.openTask(t.id) } });
-    });
+    ls.set(FIRED_KEY, JSON.stringify(fired)); ls.set(SNOOZE_KEY, JSON.stringify(snoozed));
+    // Opening the app with lots already due shows one summary instead of a pile of pop-ups.
+    if (quiet && due.length > 3) { U.toast(due.length + " deadlines are coming up", { icon: "bell", detail: due.slice(0, 3).map((t) => t.title).join(", "), action: { label: "Show", run: () => go("home") } }); return; }
+    due.forEach((t) => showReminder(t));
+    if (st.reminderSound) chime();
   }
+  function showReminder(t, example) {
+    let box = document.getElementById("reminders");
+    if (!box) { box = el("div", { class: "reminders", id: "reminders", role: "region", "aria-label": "Reminders" }); document.body.append(box); }
+    const old = box.querySelector('[data-task="' + t.id + '"]');
+    if (old) old.remove();
+    const now = App.now(), text = "Due " + C.countdown(t.due - now);
+    const card = el("div", { class: "reminder", role: "alert", "data-task": t.id },
+      el("div", { class: "rm-ic" }, icon("bell")),
+      el("div", { class: "rm-body" },
+        el("span", { class: "eyebrow", text: example ? "Example reminder" : "Reminder" }),
+        el("b", { class: "rm-title", text: t.title }),
+        el("span", { class: "rm-when", text: text + (t.subject ? " · " + t.subject : "") + " · " + C.dueLabel(t) }),
+        el("div", { class: "rm-actions" },
+          U.btn("Open", { size: "xs", kind: "primary", onclick: () => { close(); if (!example) App.openTask(t.id); } }),
+          example ? null : U.btn("Mark done", { size: "xs", kind: "go", icon: "check", onclick: () => { close(); App.complete(t.id, true); } }),
+          U.btn("Snooze 10 min", { size: "xs", icon: "clock", onclick: () => { close(); if (example) return; snoozed[t.id] = App.now() + 10 * C.MIN; ls.set(SNOOZE_KEY, JSON.stringify(snoozed)); U.toast("I'll remind you again in 10 minutes", { icon: "clock" }); } }))),
+      U.iconBtn("x", "Dismiss reminder", () => close(), { class: "icon-btn sm" }));
+    function close() { card.classList.add("leaving"); setTimeout(() => card.remove(), 200); }
+    box.prepend(card);
+    while (box.children.length > 3) box.lastChild.remove();
+    const st = App.store.settings();
+    if (!example && st.notify && App.notifySupported() && Notification.permission === "granted" && document.hidden) {
+      try {
+        const n = new Notification(text + ": " + t.title, { body: [t.subject, C.dueLabel(t)].filter(Boolean).join(" · "), tag: t.id });
+        n.onclick = () => { window.focus(); App.openTask(t.id); n.close(); };
+      } catch (e) { /* the card is already showing in the page */ }
+    }
+  }
+  // A short two-note chime. Browsers may block sound until the page has been clicked once.
+  let reminderAudio = null;
+  function chime() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      reminderAudio = reminderAudio || new AC();
+      if (reminderAudio.state === "suspended") reminderAudio.resume();
+      [[0, 660], [0.18, 880]].forEach(([d, f]) => {
+        const o = reminderAudio.createOscillator(), g = reminderAudio.createGain(), t0 = reminderAudio.currentTime + d;
+        o.frequency.value = f; o.connect(g); g.connect(reminderAudio.destination);
+        g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.2, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.3);
+        o.start(t0); o.stop(t0 + 0.32);
+      });
+    } catch (e) { /* no sound available */ }
+  }
+  App.testReminder = function () {
+    const due = App.now() + 30 * C.MIN;
+    showReminder(Object.assign(C.blankTask(), { id: "example", title: "Physics lab report", subject: "Physics SL", due }), true);
+    if (App.store.settings().reminderSound) chime();
+  };
   App.checkReminders = checkReminders;
 
   // ---------- ManageBac auto-sync through the student's own Google Apps Script relay ----------
@@ -372,7 +427,8 @@
   }
 
   // ---------- background ----------
-  setInterval(() => { checkReminders(false); maybeSyncManageBac(); if (!document.hidden && !document.querySelector("dialog[open]")) scheduleRender(); }, 30000);
+  setInterval(() => checkReminders(false), 15000);
+  setInterval(() => { maybeSyncManageBac(); if (!document.hidden && !document.querySelector("dialog[open]")) scheduleRender(); }, 30000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) { checkReminders(false); maybeSyncManageBac(); scheduleRender(); } });
   window.addEventListener("storage", (e) => { if (App.store && e.key === App.store.key) App.store.mergeFromStorage(); });
 

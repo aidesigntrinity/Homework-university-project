@@ -318,6 +318,45 @@ const DAY = 864e5;
     ok("unreadable saved data is kept aside with a clear message; a full storage shows a warning with a backup button and nothing is lost from the screen");
     await ctx.close();
 
+    // ---------- reminder pop-ups ----------
+    ({ ctx, p } = await page());
+    await p.clock.install({ time: T0 });
+    await p.goto(BASE + "#/settings/notifications"); await p.waitForSelector("#set-leads-custom");
+    assert.strictEqual(await p.getAttribute("[aria-label='Default reminder times'] .chip:text-is('30 min')", "aria-pressed"), "true");
+    await p.click("#set-leads-custom"); await p.fill("#set-leads-n", "45"); await p.selectOption("#set-leads-u", "min"); await p.click("#set-leads-add");
+    await H.until(p, () => DB.app.store.settings().leads.indexOf(0.75) !== -1);
+    assert.strictEqual(await p.getAttribute("[aria-label='Default reminder times'] .chip:text-is('45 min')", "aria-pressed"), "true");
+    await p.click("#set-rem-test");
+    await p.waitForSelector(".reminder:has-text('Example reminder')");
+    await p.screenshot({ path: path.join(OUT, "reminder-test.png") });
+    await p.click(".reminder button[aria-label='Dismiss reminder']");
+    await H.until(p, () => !document.querySelector(".reminder"));
+    ok("Settings: reminder times include minutes; a custom time (45 minutes) can be added; 'Show a test reminder' pops one up");
+    await p.goto(BASE + "#/home"); await p.waitForSelector(".hero");
+    await p.keyboard.press("n"); await p.waitForSelector("#e-title");
+    await p.fill("#e-title", "Chemistry quiz prep"); await p.fill("#e-date", H.ymd(T0)); await p.fill("#e-time", "12:00");
+    await p.click("#editor summary");
+    for (const c of ["1 day", "3 h", "45 min"]) await p.click(`#editor [aria-label='Reminder times for this homework'] .chip:text-is('${c}')`);   // keep only 30 min for this homework
+    await p.click("#e-save"); await p.waitForSelector("#editor", { state: "detached" });
+    assert.deepStrictEqual(await p.evaluate(() => DB.app.store.tasks().find((t) => t.title === "Chemistry quiz prep").reminders), [0.5]);
+    await H.dismissToasts(p);
+    await p.clock.runFor(85 * 60000);   // 11:25, due in 35 minutes
+    assert.strictEqual(await p.$$eval(".reminder", (n) => n.length), 0, "nothing before its time");
+    await p.clock.runFor(6 * 60000);    // 11:31
+    await p.waitForSelector(".reminder:has-text('Chemistry quiz prep')");
+    assert.match(await H.text(p, ".reminder"), /Due in 2\d min/);
+    await p.screenshot({ path: path.join(OUT, "reminder-30min.png") });
+    await p.click(".reminder button:has-text('Snooze 10 min')");
+    await H.until(p, () => !document.querySelector(".reminder"));
+    await p.clock.runFor(5 * 60000);
+    assert.strictEqual(await p.$$eval(".reminder", (n) => n.length), 0, "snoozed");
+    await p.clock.runFor(6 * 60000);
+    await p.waitForSelector(".reminder:has-text('Chemistry quiz prep')");
+    await p.click(".reminder button:has-text('Mark done')");
+    await H.until(p, () => DB.app.store.tasks().find((t) => t.title === "Chemistry quiz prep").done);
+    ok("a 30-minute reminder pops up 30 minutes before the deadline (not earlier), stays until acted on, snoozes for 10 minutes, and 'Mark done' finishes the homework");
+    await ctx.close();
+
     console.log(errors.length ? "\nPAGE ERRORS:\n" + errors.join("\n") : "\nno page errors");
     if (errors.length) process.exitCode = 1;
   } catch (e) {

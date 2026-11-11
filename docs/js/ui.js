@@ -176,6 +176,40 @@
     return s;
   }
 
+  // ---------- reminder time picker ----------
+  // Chips for common times (10 min … 2 days) plus any custom time. `selected` and the list passed to
+  // onchange are hours before the due time (0.5 = 30 minutes).
+  function leadPicker(o) {
+    let sel = C.cleanLeads(o.selected);
+    const box = el("div", { class: "stack sm" });
+    const chips = el("div", { class: "chips", role: "group", "aria-label": o.label || "Reminder times" });
+    const num = el("input", { class: "input sm", type: "number", min: "1", max: "999", step: "1", id: o.id + "-n", placeholder: "45", style: { width: "88px" }, "aria-label": "Custom reminder amount" });
+    const unit = select([{ v: "min", label: "minutes before" }, { v: "h", label: "hours before" }, { v: "d", label: "days before" }], "min", () => {}, { class: "select sm", id: o.id + "-u", "aria-label": "Custom reminder unit", style: { width: "auto" } });
+    const err = el("span", { class: "hint coral", hidden: true });
+    const custom = el("div", { class: "row wrap", hidden: true, style: { gap: "8px" } }, num, unit, btn("Add", { size: "sm", id: o.id + "-add", onclick: addCustom }), err);
+    function set(list) { sel = C.cleanLeads(list); draw(); o.onchange(sel.slice()); }
+    function addCustom() {
+      const n = Math.round(+num.value), mult = { min: 1 / 60, h: 1, d: 24 }[unit.value];
+      const v = C.cleanLead(n * mult);
+      if (!(n >= 1) || !v) { err.textContent = "Pick a time up to 14 days before."; err.hidden = false; num.focus(); return; }
+      err.hidden = true; num.value = "";
+      if (sel.indexOf(v) === -1) set(sel.concat([v]));
+    }
+    num.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } });
+    function draw() {
+      const all = C.REMINDER_CHOICES.slice();
+      sel.forEach((v) => { if (all.indexOf(v) === -1) all.push(v); });
+      all.sort((a, b) => a - b);
+      fill(chips, ...all.map((h) => el("button", { class: "chip", type: "button", "aria-pressed": String(sel.indexOf(h) !== -1), onclick: () => {
+        const i = sel.indexOf(h); set(i === -1 ? sel.concat([h]) : sel.filter((x) => x !== h));
+      } }, C.fmtLead(h))), el("button", { class: "chip dashed", type: "button", id: o.id + "-custom", "aria-expanded": String(!custom.hidden), onclick: () => { custom.hidden = !custom.hidden; draw(); if (!custom.hidden) num.focus(); } }, icon("plus", 15), "Custom"));
+    }
+    draw();
+    box.append(chips, custom);
+    box.setSelected = (list) => { sel = C.cleanLeads(list); draw(); };
+    return box;
+  }
+
   // ---------- toasts ----------
   let toastBox = null;
   function toast(message, opts) {
@@ -341,5 +375,5 @@
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
 
-  DB.ui = { $, $$, el, append, fill, add, svg, icon, ICONS, btn, iconBtn, tag, prio, cbx, meter, ring, empty, banner, field, seg, switchEl, switchRow, select, toast, sheet, confirmDialog, menu, closeMenus, taskRow, bars, keepFocus, keepTyping, initials, download };
+  DB.ui = { $, $$, el, append, fill, add, svg, icon, ICONS, btn, iconBtn, tag, prio, cbx, meter, ring, empty, banner, field, seg, switchEl, switchRow, select, toast, sheet, confirmDialog, menu, closeMenus, taskRow, bars, keepFocus, keepTyping, leadPicker, initials, download };
 })();

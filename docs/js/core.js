@@ -83,6 +83,24 @@
   function fmtMins(m) { m = Math.round(m || 0); const h = Math.floor(m / 60), r = m % 60; return h ? h + " h" + (r ? " " + r + " min" : "") : r + " min"; }
   function fmtHours(m) { m = Math.round(m || 0); return m < 60 ? m + "m" : (Math.round(m / 6) / 10).toString().replace(/\.0$/, "") + "h"; }
 
+  // ---------- reminders ----------
+  // Reminder times are stored as hours before the due time; fractions give minutes (0.5 = 30 min).
+  // Values are kept to whole minutes, up to 14 days before.
+  function cleanLead(n) { n = Math.round(+n * 60) / 60; return n > 0 && n <= 336 ? n : 0; }
+  function cleanLeads(list, max) {
+    const out = [];
+    (Array.isArray(list) ? list : []).forEach((n) => { const v = cleanLead(n); if (v && out.indexOf(v) === -1) out.push(v); });
+    return out.sort((a, b) => b - a).slice(0, max || 8);
+  }
+  const REMINDER_CHOICES = [10 / 60, 15 / 60, 0.5, 1, 2, 3, 6, 12, 24, 48].map(cleanLead);
+  // "30 min", "2 h", "1 h 30 min", "1 day", "2 days"
+  function fmtLead(h) {
+    const m = Math.round(h * 60);
+    if (m < 60) return m + " min";
+    if (m % 1440 === 0) { const d = m / 1440; return d + (d === 1 ? " day" : " days"); }
+    return Math.floor(m / 60) + " h" + (m % 60 ? " " + (m % 60) + " min" : "");
+  }
+
   // ---------- calendar files (iCalendar / ManageBac) ----------
   function tzOffsetMs(tz, ts) {
     const dtf = new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" });
@@ -491,6 +509,7 @@
   const api = {
     MIN, HOUR, DAY, cyrb53, hash, newId, pad, startOfDay, addDays, addMonths, dayKey, keyToMs, dayDiff, weekStartOf, weekDays, monthGrid,
     DOW, DOW_FULL, MON, MONTH_FULL, fmtDay, fmtTime, fmtLong, dueLabel, relDay, span, countdown, bigCount, mmss, fmtMins, fmtHours,
+    cleanLead, cleanLeads, REMINDER_CHOICES, fmtLead,
     parseIcsDate, parseICS, reconcileFeed, feedId, MB_LINK, MB_FIELDS,
     PRIORITIES, blankTask, isActive, isOpen, counted, groupOf, subtaskProgress, estOf,
     DEFAULT_PTS, DEFAULT_NAMES, pointsFor, howFor, levelStart, levelName, levelInfo, streakFromDays, longestFromDays, computeStats, completionRate,

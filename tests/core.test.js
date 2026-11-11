@@ -197,3 +197,11 @@ test("URLs: only web links are kept", () => {
   assert.equal(C.safeUrl("javascript:alert(1)"), ""); assert.equal(C.safeUrl("example.com/a"), "https://example.com/a");
   assert.ok(C.isSyncUrl("https://script.google.com/macros/s/AKfy_1/exec?key=x")); assert.ok(!C.isSyncUrl("https://evil.com/exec"));
 });
+
+test("reminder times: minutes, hours and days, kept to whole minutes", () => {
+  assert.equal(C.fmtLead(0.5), "30 min"); assert.equal(C.fmtLead(10 / 60), "10 min"); assert.equal(C.fmtLead(1.5), "1 h 30 min");
+  assert.equal(C.fmtLead(3), "3 h"); assert.equal(C.fmtLead(24), "1 day"); assert.equal(C.fmtLead(48), "2 days");
+  assert.equal(C.cleanLead(45 / 60), 0.75); assert.equal(C.cleanLead(0), 0); assert.equal(C.cleanLead(400), 0); assert.equal(C.cleanLead("x"), 0);
+  assert.deepEqual(C.cleanLeads([0.5, 24, 0.5, 3, -1]), [24, 3, 0.5], "deduplicated, largest first, bad values dropped");
+  assert.ok(C.REMINDER_CHOICES.indexOf(C.cleanLead(0.5)) !== -1);
+});

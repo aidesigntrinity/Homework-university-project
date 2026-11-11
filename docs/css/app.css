@@ -525,6 +525,21 @@ table.data tr:last-child td { border-bottom: 0; }
 .toast.leaving { opacity: 0; transform: translateY(8px); transition: 200ms; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
 
+/* ---------- reminder pop-ups ---------- */
+.reminders { position: fixed; z-index: 92; top: calc(10px + env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+@media (min-width: 720px) { .reminders { left: auto; right: 20px; top: calc(var(--topbar-h) + 8px); width: 400px; } }
+.reminder { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 14px 10px 14px 14px; border-radius: var(--r-lg); background: var(--surface); border: 1.5px solid var(--amber);
+  box-shadow: var(--shadow-3); pointer-events: auto; animation: reminder-in 260ms var(--ease); transition: opacity 200ms, transform 200ms; }
+.reminder.leaving { opacity: 0; transform: translateY(-8px); }
+.reminder .rm-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--amber); color: var(--on-amber); display: grid; place-items: center; flex: none; }
+.reminder .rm-ic svg { width: 22px; height: 22px; animation: ring-bell 900ms ease-in-out 2; transform-origin: 50% 10%; }
+.reminder .rm-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.reminder .rm-title { font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
+.reminder .rm-when { font-size: 13px; color: var(--amber-text); font-weight: 600; }
+.reminder .rm-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+@keyframes reminder-in { from { opacity: 0; transform: translateY(-14px); } }
+@keyframes ring-bell { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(14deg); } 40% { transform: rotate(-12deg); } 60% { transform: rotate(8deg); } 80% { transform: rotate(-4deg); } }
+
 /* ---------- dialogs ---------- */
 dialog { border: 0; padding: 0; color: var(--text); background: transparent; max-width: none; max-height: none; }
 dialog::backdrop { background: var(--scrim); backdrop-filter: blur(2px); }
